@@ -1,0 +1,23 @@
+{
+  "name": "strategy-game",
+  "version": "1.0.0",
+  "description": "Strategy game for YR Hacks 2021",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./server/server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/6176UD/strategy-game.git"
+  },
+  "author": "FIXME",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/6176UD/strategy-game/issues"
+  },
+  "homepage": "https://github.com/6176UD/strategy-game#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^4.0.1"
+  }
+}
