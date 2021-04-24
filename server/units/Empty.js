@@ -2,12 +2,7 @@ const Unit = require('./Unit');
 
 module.exports = class Empty extends Unit {
   constructor(battle, q, r) {
-    super('Empty', 0, 0, battle, 0, q, r);
-  }
-
-  // Cannot attack
-  canAttack(q, r) {
-    return false;
+    super('Empty', 0, 0, false, battle, 0, q, r);
   }
 
   // Does not take damage

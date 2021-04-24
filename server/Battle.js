@@ -37,14 +37,18 @@ module.exports = class Battle {
     this.emitUnitUpdate(this.grid[0][-MAP_RADIUS + 2]);
 
     // Player 1's turn
-    this.turn = 1;
-    this.emitTurnUpdate(1);
+    this.turn = 2;
+    this.handleEndTurn(2);
 
     // Listen for input from players
     for (const player of Object.values(this.room.players)) {
       player.socket.on('move', data => {
         if (!('q1' in data) || !('r1' in data) || !('q2' in data) || !('r2' in data)) return;
         this.handleMove(player.num, data.q1, data.r1, data.q2, data.r2)
+      });
+      player.socket.on('attack', data => {
+        if (!('q1' in data) || !('r1' in data) || !('q2' in data) || !('r2' in data)) return;
+        this.handleAttack(player.num, data.q1, data.r1, data.q2, data.r2)
       });
       player.socket.on('end-turn', () => this.handleEndTurn(player.num));
     }
@@ -64,7 +68,10 @@ module.exports = class Battle {
         'r': r,
         'name': unit.name,
         'health': unit.health,
+        'movesPerTurn': unit.movesPerTurn,
         'moves': unit.moves,
+        'canAttack': unit.canAttack,
+        'canAttackThisTurn': unit.canAttackThisTurn,
         'owns': player.num === unit.playerNum
       });
     }
@@ -105,14 +112,30 @@ module.exports = class Battle {
 
     const unit = this.grid[q1][r1];
     unit.q = q2, unit.r = r2;
-    unit.move -= Hex.dist(q1, r1, q2, r2);
+    unit.moves -= Hex.dist(q1, r1, q2, r2);
     this.grid[q1][r1] = new Empty(this, q1, r1);
     this.grid[q2][r2] = unit;
     this.emitUnitUpdate(this.grid[q1][r1]);
     this.emitUnitUpdate(this.grid[q2][r2]);
-
   }
 
+  // Called when client attacks with a unit
+  // ! FIXME just handling a lot of stuff instead of in the class because no time
+  handleAttack(playerNum, q1, r1, q2, r2) {
+    if (!(q1 in this.grid) || !(r1 in this.grid[q1])
+      || !(q2 in this.grid) || !(r2 in this.grid[q2])) return;
+    
+    if (playerNum == 2) {
+      q1 = -q1, r1 = -r1, q2 = -q2, r2 = -r2;
+    }
+    if (this.turn !== playerNum
+      || this.grid[q1][r1].playerNum !== playerNum
+      || !(this.grid[q1][r1].canAttackTarget(q2, r2))) return;
+
+    this.grid[q1][r1].attack(q2, r2);
+    this.grid[q1][r1].canAttackThisTurn = false;
+    this.emitUnitUpdate(this.grid[q1][r1]);
+  }
   // Called when player ends their turn
   handleEndTurn(playerNum) {
     if (playerNum !== this.turn) return;
@@ -125,6 +148,7 @@ module.exports = class Battle {
       for (let r = r1; r <= r2; r++) {
         if (this.grid[q][r].playerNum == this.turn) {
           this.grid[q][r].resetMoves();
+          this.grid[q][r].resetAttack();
           // ! FIXME: this should just be mirrored by the frontend to reduce emits
           this.emitUnitUpdate(this.grid[q][r]);
         }

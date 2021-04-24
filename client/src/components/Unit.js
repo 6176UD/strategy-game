@@ -17,14 +17,12 @@ class Unit extends Component {
 
   render() {
     const q = this.props.q, r = this.props.r;
-    const health = this.props.health;
-    const moves = this.props.moves;
     const img = this.props.img;
     const x = SIZE * 3./2 * q;
     const y = SIZE * (Math.sqrt(3) / 2 * q + Math.sqrt(3) * r);
     const style = {
       position: 'absolute',
-      left: `${x + SIZE * 12}px`,
+      left: `${x + SIZE * 15}px`,
       top: `${y + SIZE * 12}px`,
     };
     const imgStyle = {
@@ -53,14 +51,6 @@ class Unit extends Component {
             onClick={this.handleClick}
           />
         </div>
-
-        {/* FIXME coordinates and scaling */}
-        {/* {health &&
-          <div style={textStyle}>
-            <p>{health}HP</p>
-            <p>{moves}MV</p>
-          </div>
-        } */}
       </div>
     );
   }

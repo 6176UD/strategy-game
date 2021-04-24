@@ -60,8 +60,9 @@ class Battle extends Component {
     // Bind functions
     this.handleUnitUpdate = this.handleUnitUpdate.bind(this);
     this.handleUnitClick = this.handleUnitClick.bind(this);
-    this.handleMoveClick = this.handleMoveClick.bind(this);
     this.handleEndTurnClick = this.handleEndTurnClick.bind(this);
+    this.handleMoveClick = this.handleMoveClick.bind(this);
+    this.handleAttackClick = this.handleAttackClick.bind(this);
   }
 
   handleUnitUpdate(unit) {
@@ -72,7 +73,10 @@ class Battle extends Component {
         q={unit.q} r={unit.r}
         name={unit.name}
         health={unit.health}
+        movesPerTurn={unit.movesPerTurn}
         moves={unit.moves}
+        canAttack={unit.canAttack}
+        canAttackThisTurn={unit.canAttackThisTurn}
         owns={unit.owns}
         img={img}
         battleRef={this}
@@ -101,6 +105,15 @@ class Battle extends Component {
         });
         break;
       case 'attack':
+        // Emit attack, then deselect
+        this.props.socket.emit('attack', {
+          q1: this.state.selq, r1: this.state.selr,
+          q2: q, r2: r
+        });
+        this.setState({
+          sel: false,
+          action: 'sel'
+        });
         break;
       default: break;
     }
@@ -112,6 +125,10 @@ class Battle extends Component {
 
   handleMoveClick() {
     this.setState({ action: 'move' });
+  }
+
+  handleAttackClick() {
+    this.setState({ action: 'attack' });
   }
 
   componentDidMount() {

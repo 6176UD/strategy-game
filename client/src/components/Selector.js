@@ -13,7 +13,7 @@ class Selector extends Component {
     const y = SIZE * (Math.sqrt(3) / 2 * q + Math.sqrt(3) * r);
     const style = {
       position: 'absolute',
-      left: `${x + SIZE * 12}px`,
+      left: `${x + SIZE * 15}px`,
       top: `${y + SIZE * 12}px`,
     };
     return (

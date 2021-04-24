@@ -4,10 +4,14 @@ class InfoMenu extends Component {
   constructor(props) {
     super(props);
     this.handleMoveClick = this.handleMoveClick.bind(this);
+    this.handleAttackClick = this.handleAttackClick.bind(this);
   }
 
   handleMoveClick() {
     this.props.battleRef.handleMoveClick();
+  }
+  handleAttackClick() {
+    this.props.battleRef.handleAttackClick();
   }
 
   render() {
@@ -20,12 +24,32 @@ class InfoMenu extends Component {
     }
     const health = unit.health;
     const moves = unit.moves;
+    const movesPerTurn = unit.movesPerTurn;
+    const canAttack = unit.canAttack;
+    const canAttackThisTurn = unit.canAttackThisTurn;
     return (
       <div>
         <p>Unit: {name} ({owns ? 'Player' : 'Enemy'})</p>
         <p>Health: {health}</p>
-        {turn && owns && (moves > 0) && <p>Moves: {moves}</p>}
-        {turn && owns && (moves > 0) && <button onClick={this.handleMoveClick}>Move</button>}
+        {(movesPerTurn > 0) ?
+          <div>
+            <p>Moves per turn: {movesPerTurn}</p>
+            {(turn == owns) && <p>Moves: {moves}</p>}
+            {turn && owns && (moves > 0) && <button onClick={this.handleMoveClick}>Move</button>}
+          </div> : <p>Cannot move</p>
+        }
+        {canAttack ?
+          <div>
+            {(turn == owns) ?
+              ((canAttackThisTurn) ?
+                <p>Can attack this turn</p> : <p>Cannot attack this turn</p>
+              ) : <p>Can attack next turn</p>
+            }
+            {turn && owns && canAttackThisTurn &&
+              <button onClick={this.handleAttackClick}>Attack</button>
+            }
+          </div> : <p>Cannot attack</p>
+        }
       </div>
     );
   }
