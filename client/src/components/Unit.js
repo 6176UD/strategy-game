@@ -28,13 +28,17 @@ class Unit extends Component {
       left: `${x + SIZE * 12}px`,
       top: `${y + SIZE * 12}px`,
     };
-    const absStyle = {
+    const imgStyle = {
       position: 'absolute'
+    }
+    const textStyle = {
+      position: 'absolute',
+      left: `${SIZE / 2}px`
     }
     return (
       <div style={style}>
         <div></div>
-        <div style={absStyle}>
+        <div style={imgStyle}>
           <img
             src={hexImg}
             width={SIZE * 2}
@@ -42,7 +46,7 @@ class Unit extends Component {
             onClick={this.handleClick}
           />
         </div>
-        <div style={absStyle}>
+        <div style={imgStyle}>
           <img
             src={img}
             width={SIZE * 2}
@@ -52,9 +56,9 @@ class Unit extends Component {
         </div>
 
         {/* FIXME coordinates and scaling */}
-        {this.health &&
-          <div>
-            <p>{health}HP</p><br />
+        {health &&
+          <div style={textStyle}>
+            <p>{health}HP</p>
             <p>{moves}MV</p>
           </div>
         }
