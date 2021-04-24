@@ -47,6 +47,7 @@ module.exports = class Battle {
         if (!('q1' in data) || !('r1' in data) || !('q2' in data) || !('r2' in data)) return;
         this.handleMove(player.num, data.q1, data.r1, data.q2, data.r2)
       });
+      player.socket.on('end-turn', () => this.handleEndTurn(player.num));
     }
   }
 
@@ -98,9 +99,9 @@ module.exports = class Battle {
     if (playerNum == 2) {
       q1 = -q1, r1 = -r1, q2 = -q2, r2 = -r2;
     }
-    if (this.grid[q2][r2].name != 'Empty'
-      || this.turn != playerNum
-      || this.grid[q1][r1].playerNum != playerNum
+    if (this.grid[q2][r2].name !== 'Empty'
+      || this.turn !== playerNum
+      || this.grid[q1][r1].playerNum !== playerNum
       || Hex.dist(q1, r1, q2, r2) > this.grid[q1][r1].moves) return;
 
     const unit = this.grid[q1][r1];
@@ -111,12 +112,11 @@ module.exports = class Battle {
     this.emitUnitUpdate(this.grid[q1][r1]);
     this.emitUnitUpdate(this.grid[q2][r2]);
 
-    // ! TESTING: auto pass turn after move
-    this.handleEndTurn();
   }
 
-  // Just testing right now. Will be called when client passes turn.
-  handleEndTurn() {
+  // Called when player ends their turn
+  handleEndTurn(playerNum) {
+    if (playerNum !== this.turn) return;
     this.turn = (this.turn % 2) + 1;
     this.emitTurnUpdate(this.turn);
 

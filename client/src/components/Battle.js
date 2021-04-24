@@ -61,6 +61,7 @@ class Battle extends Component {
     this.handleUnitUpdate = this.handleUnitUpdate.bind(this);
     this.handleUnitClick = this.handleUnitClick.bind(this);
     this.handleMoveClick = this.handleMoveClick.bind(this);
+    this.handleEndTurnClick = this.handleEndTurnClick.bind(this);
   }
 
   handleUnitUpdate(unit) {
@@ -105,6 +106,10 @@ class Battle extends Component {
     }
   }
 
+  handleEndTurnClick() {
+    this.props.socket.emit('end-turn');
+  }
+
   handleMoveClick() {
     this.setState({ action: 'move' });
   }
@@ -127,7 +132,6 @@ class Battle extends Component {
           units.push(unit);
         }
       }
-      console.log(this.state.sel);
       if (this.state.sel) {
         units.push(<Selector
           key='selector'
@@ -139,6 +143,7 @@ class Battle extends Component {
       <div>
         <p>Battle Zone! (WIP)</p>
         <p>{this.state.turn ? 'Your' : "Opponent's"} Turn</p>
+        {this.state.turn && <button onClick={this.handleEndTurnClick}>End Turn</button>}
         {units}
         {this.state.sel &&
         <InfoMenu
