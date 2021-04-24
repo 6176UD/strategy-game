@@ -16,7 +16,7 @@ class InfoMenu extends Component {
     const owns = unit.owns;
     const name = unit.name;
     if (name == 'Empty') {
-      return (<div>Empty Tile</div>);
+      return (<div><p>Empty Tile</p></div>);
     }
     const health = unit.health;
     const moves = unit.moves;
