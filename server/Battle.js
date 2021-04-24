@@ -38,6 +38,7 @@ module.exports = class Battle {
     this.emitUnitUpdate(this.grid[0][-MAP_RADIUS + 2]);
 
     // Player 1's turn
+    this.turn = 1;
     this.emitTurnUpdate(1);
 
     // Listen for input from players
@@ -94,15 +95,20 @@ module.exports = class Battle {
     if (!(q1 in this.grid) || !(r1 in this.grid[q1])
       || !(q2 in this.grid) || !(r2 in this.grid[q2])
       || this.grid[q2][r2].name != 'Empty'
-      || this.grid[q1][q2].playerNum != playerNum
-      || Hex.dist(q1, r1, q2, r2) > this.grid[q1][q2].moves) return;
+      || this.turn != playerNum
+      || this.grid[q1][r1].playerNum != playerNum
+      || Hex.dist(q1, r1, q2, r2) > this.grid[q1][r1].moves) return;
 
     const unit = this.grid[q1][r1];
     unit.q = q2, unit.r = r2;
-    unit.move -= Hex.dis(q1, r1, q2, r2);
-    this.grid[q1][r1] = new Empty(this, q, r);
+    unit.move -= Hex.dist(q1, r1, q2, r2);
+    this.grid[q1][r1] = new Empty(this, q1, r1);
     this.grid[q2][r2] = unit;
     this.emitUnitUpdate(this.grid[q1][r1]);
     this.emitUnitUpdate(this.grid[q2][r2]);
+
+    // ! TESTING: auto pass turn after move
+    this.turn = (this.turn % 2) + 1;
+    this.emitTurnUpdate(this.turn);
   }
 }
