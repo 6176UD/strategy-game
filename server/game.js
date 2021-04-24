@@ -37,9 +37,9 @@ exports.addPlayer = (socket, roomKey) => {
   }
 
   // ! DEBUGGING
-  // if (room.status == 'draft') {
-  //   this.startBattle(room);
-  // }
+  if (room.status == 'draft') {
+    this.startBattle(room);
+  }
 
   return true; // Successfully joined room
 };

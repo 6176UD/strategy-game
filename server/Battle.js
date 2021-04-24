@@ -41,9 +41,8 @@ module.exports = class Battle {
         'r': r,
         'name': unit.name,
         'health': unit.health,
-        'movesPerTurn': unit.movesPerTurn,
         'moves': unit.moves,
-        'owns': player.num == unit.playerNum
+        'owns': player.num === unit.playerNum
       });
     }
   }
@@ -51,6 +50,7 @@ module.exports = class Battle {
   // Called by units when they attack
   dealDamage(q, r, dmg) {
     if (q in this.grid && r in this.grid[q]) {
+      if (room.grid[q][r].name == 'Empty') return;
       room.grid[q][r].takeDamage(dmg);
       if (room.grid[q][r].health < 1) {
         room.grid[q][r] = new Empty(this, q, r);
