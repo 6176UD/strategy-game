@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
-// ! FIXME figure this out
+import hexImg from '../img/hexagon.png';
+
 const SIZE = 40;
 
 // Displays a unit tile. Does NOT handle any game logic.
@@ -27,14 +28,28 @@ class Unit extends Component {
       left: `${x + SIZE * 12}px`,
       top: `${y + SIZE * 12}px`,
     };
+    const absStyle = {
+      position: 'absolute'
+    }
     return (
       <div style={style}>
-        <img
-          src={img}
-          width={SIZE * 2}
-          height={SIZE * 2}
-          onClick={this.handleClick}
-        />
+        <div></div>
+        <div style={absStyle}>
+          <img
+            src={hexImg}
+            width={SIZE * 2}
+            height={SIZE * 2}
+            onClick={this.handleClick}
+          />
+        </div>
+        <div style={absStyle}>
+          <img
+            src={img}
+            width={SIZE * 2}
+            height={SIZE * 2}
+            onClick={this.handleClick}
+          />
+        </div>
 
         {/* FIXME coordinates and scaling */}
         {this.health &&

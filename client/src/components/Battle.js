@@ -5,7 +5,7 @@ import Selector from './Selector';
 // Import tile images
 import emptyImg from '../img/empty.png';
 import basePlayerImg from '../img/base-player.png';
-import selectorImg from '../img/selector.png';
+import baseEnemyImg from '../img/base-enemy.png';
 
 const NAME_TO_IMG = {
   // Owns
@@ -15,7 +15,7 @@ const NAME_TO_IMG = {
   // Does not own
   false: {
     'Empty': emptyImg,
-    'Base': basePlayerImg,
+    'Base': baseEnemyImg,
   },
 }
 
@@ -27,13 +27,14 @@ class Battle extends Component {
   constructor() {
     super();
     // Mirror server by initalizing grid as empty units
-    this.grid = {};
+    const grid = {};
     for (let q = -MAP_RADIUS; q <= MAP_RADIUS; q++) {
-      this.grid[q] = {};
+      grid[q] = {};
       let r1 = Math.max(-MAP_RADIUS, -q - MAP_RADIUS);
       let r2 = Math.min(MAP_RADIUS, -q + MAP_RADIUS);
       for (let r = r1; r <= r2; r++) {
-        this.grid[q][r] = <Unit
+        grid[q][r] = <Unit
+          key = {[q, r]}
           q={q} r={r}
           name='Empty'
           health=''
@@ -44,15 +45,23 @@ class Battle extends Component {
         />;
       }
     }
-    // Init with no selected unit
-    this.sel = false;
-    this.action = 'sel';
+    this.state = {
+      grid: grid,
+      sel: false,
+      action: 'sel'
+    }
+
+    // Bind functions
+    this.handleUnitUpdate = this.handleUnitUpdate.bind(this);
+    this.handleUnitClick = this.handleUnitClick.bind(this);
   }
 
+  // ! FIXME: Messy, slow, and non-reacty
   handleUnitUpdate(unit) {
-    console.log(unit.owns);
     const img = NAME_TO_IMG[unit.owns][unit.name];
-    this.grid[unit.q][unit.r] = <Unit
+    console.log(this);
+    const grid = this.state.grid;
+    grid[unit.q][unit.r] = <Unit
       q={unit.q} r={unit.r}
       name={unit.name}
       health={unit.health}
@@ -61,20 +70,22 @@ class Battle extends Component {
       img={img}
       battleRef={this}
     />
+    this.setState({ grid: grid });
   }
 
   handleUnitClick(q, r) {
-    switch (this.action) {
+    console.log(this);
+    switch (this.state.action) {
       case 'sel':
-        this.sel = true;
-        this.selq = q;
-        this.selr = r;
+        this.setState({
+          sel: true,
+          selq: q,
+          selr: r
+        });
         break;
       case 'move':
-        this.sel = false;
         break;
       case 'attack':
-        this.sel = false;
         break;
       default: break;
     }
@@ -89,16 +100,19 @@ class Battle extends Component {
 
   render() {
     const units = [];
-    for (const [q, row] of Object.entries(this.grid)) {
-      for (const [r, unit] of Object.entries(row)) {
-        units.push(unit);
+    if (this.state) {
+      for (const [q, row] of Object.entries(this.state.grid)) {
+        for (const [r, unit] of Object.entries(row)) {
+          units.push(unit);
+        }
       }
-    }
-    if (this.sel) {
-      units.push(<Selector
-        q={this.selq} r={this.selr}
-        img={selectorImg}
-      />);
+      console.log(this.state.sel);
+      if (this.state.sel) {
+        units.push(<Selector
+          key='selector'
+          q={this.state.selq} r={this.state.selr}
+        />);
+      }
     }
     return (
       <div>
