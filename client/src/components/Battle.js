@@ -58,7 +58,6 @@ class Battle extends Component {
 
   handleUnitUpdate(unit) {
     const img = NAME_TO_IMG[unit.owns][unit.name];
-    console.log(this);
     this.setState(prevState => {
       const grid = Object.assign({}, prevState.grid);
       grid[unit.q][unit.r] = <Unit
@@ -75,7 +74,6 @@ class Battle extends Component {
   }
 
   handleUnitClick(q, r) {
-    console.log(this);
     switch (this.state.action) {
       case 'sel':
         this.setState({

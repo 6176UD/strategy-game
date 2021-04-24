@@ -12,7 +12,6 @@ class Unit extends Component {
   }
 
   handleClick() {
-    console.log(this.props);
     this.props.battleRef.handleUnitClick(this.props.q, this.props.r);
   }
 
