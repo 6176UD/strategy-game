@@ -22,7 +22,7 @@ class InfoMenu extends Component {
     const moves = unit.moves;
     return (
       <div>
-        <p>Name: {name} ({owns ? 'Player' : 'Enemy'})</p>
+        <p>Unit: {name} ({owns ? 'Player' : 'Enemy'})</p>
         <p>Health: {health}</p>
         {turn && owns && moves && <p>Moves: {moves}</p>}
         {turn && owns && moves && <button onClick={this.handleMoveClick}>Move</button>}
