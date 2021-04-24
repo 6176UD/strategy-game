@@ -93,8 +93,12 @@ module.exports = class Battle {
   // ! FIXME just handling a lot of stuff instead of in the class because no time
   handleMove(playerNum, q1, r1, q2, r2) {
     if (!(q1 in this.grid) || !(r1 in this.grid[q1])
-      || !(q2 in this.grid) || !(r2 in this.grid[q2])
-      || this.grid[q2][r2].name != 'Empty'
+      || !(q2 in this.grid) || !(r2 in this.grid[q2])) return;
+    
+    if (playerNum == 2) {
+      q1 = -q1, r1 = -r2, q2 = -q2, r2 = -r2;
+    }
+    if (this.grid[q2][r2].name != 'Empty'
       || this.turn != playerNum
       || this.grid[q1][r1].playerNum != playerNum
       || Hex.dist(q1, r1, q2, r2) > this.grid[q1][r1].moves) return;
@@ -108,7 +112,24 @@ module.exports = class Battle {
     this.emitUnitUpdate(this.grid[q2][r2]);
 
     // ! TESTING: auto pass turn after move
+    this.handlePassTurn();
+  }
+
+  // Just testing right now. Will be called when client passes turn.
+  handlePassTurn() {
     this.turn = (this.turn % 2) + 1;
     this.emitTurnUpdate(this.turn);
+
+    for (let q = -MAP_RADIUS; q <= MAP_RADIUS; q++) {
+      let r1 = Math.max(-MAP_RADIUS, -q - MAP_RADIUS);
+      let r2 = Math.min(MAP_RADIUS, -q + MAP_RADIUS);
+      for (let r = r1; r <= r2; r++) {
+        if (this.grid[q][r].playerNum == this.turn) {
+          this.grid[q][r].resetMoves();
+          // ! FIXME: this should just be mirrored by the frontend to reduce emits
+          this.emitUnitUpdate(this.grid[q][r]);
+        }
+      }
+    }
   }
 }
