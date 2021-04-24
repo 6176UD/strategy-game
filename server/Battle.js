@@ -1,5 +1,8 @@
 const MAP_RADIUS = 7;
 
+// Helper class for hexagon math
+const Hex = require('./Hex');
+
 // Import units
 const Empty = require('./units/Empty');
 const Base = require('./units/Base');
@@ -27,9 +30,23 @@ module.exports = class Battle {
 
     // ! TESTING peasants
     this.grid[0][MAP_RADIUS - 2] = new Peasant(this, 1, 0, MAP_RADIUS - 2);
-    this.emitUnitUpdate(this.grid[0][MAP_RADIUS - 2]);
     this.grid[0][-MAP_RADIUS + 2] = new Peasant(this, 2, 0, -MAP_RADIUS + 2);
+    this.grid[0][MAP_RADIUS - 2].resetMoves();
+    this.grid[0][-MAP_RADIUS + 2].resetMoves();
+    console.log(this.grid[0][MAP_RADIUS - 2].moves);
+    this.emitUnitUpdate(this.grid[0][MAP_RADIUS - 2]);
     this.emitUnitUpdate(this.grid[0][-MAP_RADIUS + 2]);
+
+    // Player 1's turn
+    this.emitTurnUpdate(1);
+
+    // Listen for input from players
+    for (const player of Object.values(this.room.players)) {
+      player.socket.on('move', data => {
+        if (!('q1' in data) || !('r1' in data) || !('q2' in data) || !('r2' in data)) return;
+        this.handleMove(player.num, data.q1, data.r1, data.q2, data.r2)
+      });
+    }
   }
 
   // Sends update to players in room that a unit on a tile has been updated
@@ -52,15 +69,40 @@ module.exports = class Battle {
     }
   }
 
+  // Emits that it is now player x's turn
+  emitTurnUpdate(x) {
+    for (const player of Object.values(this.room.players)) {
+      player.socket.emit('turn-update', player.num == x);
+    }
+  }
+
   // Called by units when they attack
   dealDamage(q, r, dmg) {
     if (q in this.grid && r in this.grid[q]) {
-      if (room.grid[q][r].name == 'Empty') return;
-      room.grid[q][r].takeDamage(dmg);
-      if (room.grid[q][r].health < 1) {
-        room.grid[q][r] = new Empty(this, q, r);
+      if (this.grid[q][r].name == 'Empty') return;
+      this.grid[q][r].takeDamage(dmg);
+      if (this.grid[q][r].health < 1) {
+        this.grid[q][r] = new Empty(this, q, r);
       }
-      this.emitUnitUpdate(room.grid[q][r])
+      this.emitUnitUpdate(this.grid[q][r])
     }
+  }
+
+  // Called when client moves a unit
+  // ! FIXME just handling a lot of stuff instead of in the class because no time
+  handleMove(playerNum, q1, r1, q2, r2) {
+    if (!(q1 in this.grid) || !(r1 in this.grid[q1])
+      || !(q2 in this.grid) || !(r2 in this.grid[q2])
+      || this.grid[q2][r2].name != 'Empty'
+      || this.grid[q1][q2].playerNum != playerNum
+      || Hex.dist(q1, r1, q2, r2) > this.grid[q1][q2].moves) return;
+
+    const unit = this.grid[q1][r1];
+    unit.q = q2, unit.r = r2;
+    unit.move -= Hex.dis(q1, r1, q2, r2);
+    this.grid[q1][r1] = new Empty(this, q, r);
+    this.grid[q2][r2] = unit;
+    this.emitUnitUpdate(this.grid[q1][r1]);
+    this.emitUnitUpdate(this.grid[q2][r2]);
   }
 }

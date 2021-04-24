@@ -3,7 +3,7 @@ const Hex = require('../Hex');
 
 module.exports = class Peasant extends Unit {
   constructor(battle, playerNum, q, r) {
-    super('Peasant', 3, 0, battle, playerNum, q, r);
+    super('Peasant', 3, 1, battle, playerNum, q, r);
   }
 
   // Melee unit

@@ -53,6 +53,7 @@ class Battle extends Component {
     this.state = {
       grid: grid,
       sel: false,
+      turn: false,
       action: 'sel'
     }
 
@@ -88,6 +89,15 @@ class Battle extends Component {
         });
         break;
       case 'move':
+        // Emit move, then deselect
+        this.props.socket.emit('move', {
+          q1: this.state.selq, r1: this.state.selr,
+          q2: q, r2: r
+        });
+        this.setState({
+          sel: false,
+          action: 'sel'
+        });
         break;
       case 'attack':
         break;
@@ -103,6 +113,9 @@ class Battle extends Component {
     this.props.socket.on('unit-update', data => {
       console.log(data);
       this.handleUnitUpdate(data);
+    });
+    this.props.socket.on('turn-update', b => {
+      this.setState({ turn: b });
     });
   }
 
@@ -124,12 +137,15 @@ class Battle extends Component {
     }
     return (
       <div>
-        {/* TODO */}
         <p>Battle Zone! (WIP)</p>
+        <p>{this.state.turn ? 'Your' : "Opponent's"} Turn</p>
         {units}
         {this.state.sel &&
-          <InfoMenu unit={this.state.grid[this.state.selq][this.state.selr]} />
-        }
+        <InfoMenu
+          unit={this.state.grid[this.state.selq][this.state.selr]}
+          turn={this.state.turn}
+          battleRef={this}
+        />}
       </div>
     );
   }

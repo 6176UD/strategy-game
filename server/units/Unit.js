@@ -16,6 +16,10 @@ module.exports = class Unit {
     this.r = r;
   }
 
+  resetMoves() {
+    this.moves = this.movesPerTurn;
+  }
+
   takeDamage(dmg) {
     this.health -= dmg;
   }
