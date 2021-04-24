@@ -1,21 +1,26 @@
 import React, { Component } from 'react';
 import Unit from './Unit';
 import Selector from './Selector';
+import InfoMenu from './InfoMenu';
 
 // Import tile images
 import emptyImg from '../img/empty.png';
 import basePlayerImg from '../img/base-player.png';
 import baseEnemyImg from '../img/base-enemy.png';
+import peasantPlayerImg from '../img/peasant-player.png';
+import peasantEnemyImg from '../img/peasant-enemy.png';
 
 const NAME_TO_IMG = {
   // Owns
   true: {
-    'Base': basePlayerImg
+    'Base': basePlayerImg,
+    'Peasant': peasantPlayerImg
   },
   // Does not own
   false: {
     'Empty': emptyImg,
     'Base': baseEnemyImg,
+    'Peasant': peasantEnemyImg
   },
 }
 
@@ -54,6 +59,7 @@ class Battle extends Component {
     // Bind functions
     this.handleUnitUpdate = this.handleUnitUpdate.bind(this);
     this.handleUnitClick = this.handleUnitClick.bind(this);
+    this.handleMoveClick = this.handleMoveClick.bind(this);
   }
 
   handleUnitUpdate(unit) {
@@ -89,6 +95,10 @@ class Battle extends Component {
     }
   }
 
+  handleMoveClick() {
+    this.setState({ action: 'move' });
+  }
+
   componentDidMount() {
     this.props.socket.on('unit-update', data => {
       console.log(data);
@@ -117,6 +127,9 @@ class Battle extends Component {
         {/* TODO */}
         <p>Battle Zone! (WIP)</p>
         {units}
+        {this.state.sel &&
+          <InfoMenu unit={this.state.grid[this.state.selq][this.state.selr]} />
+        }
       </div>
     );
   }

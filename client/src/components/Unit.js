@@ -55,12 +55,12 @@ class Unit extends Component {
         </div>
 
         {/* FIXME coordinates and scaling */}
-        {health &&
+        {/* {health &&
           <div style={textStyle}>
             <p>{health}HP</p>
             <p>{moves}MV</p>
           </div>
-        }
+        } */}
       </div>
     );
   }

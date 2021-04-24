@@ -1,7 +1,6 @@
 const MAP_RADIUS = 7;
 
 // Import units
-const Unit = require('./units/Unit');
 const Empty = require('./units/Empty');
 const Base = require('./units/Base');
 const Peasant = require('./units/Peasant');
@@ -21,10 +20,16 @@ module.exports = class Battle {
     }
 
     // Init player bases
-    this.grid[0][MAP_RADIUS] = new Base(this, 1, 0, MAP_RADIUS);
-    this.emitUnitUpdate(this.grid[0][MAP_RADIUS]);
-    this.grid[0][-MAP_RADIUS] = new Base(this, 2, 0, -MAP_RADIUS);
-    this.emitUnitUpdate(this.grid[0][-MAP_RADIUS]);
+    this.grid[0][MAP_RADIUS - 1] = new Base(this, 1, 0, MAP_RADIUS - 1);
+    this.emitUnitUpdate(this.grid[0][MAP_RADIUS - 1]);
+    this.grid[0][-MAP_RADIUS + 1] = new Base(this, 2, 0, -MAP_RADIUS + 1);
+    this.emitUnitUpdate(this.grid[0][-MAP_RADIUS + 1]);
+
+    // ! TESTING peasants
+    this.grid[0][MAP_RADIUS - 2] = new Peasant(this, 1, 0, MAP_RADIUS - 2);
+    this.emitUnitUpdate(this.grid[0][MAP_RADIUS - 2]);
+    this.grid[0][-MAP_RADIUS + 2] = new Peasant(this, 2, 0, -MAP_RADIUS + 2);
+    this.emitUnitUpdate(this.grid[0][-MAP_RADIUS + 2]);
   }
 
   // Sends update to players in room that a unit on a tile has been updated
