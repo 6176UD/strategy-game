@@ -96,7 +96,7 @@ module.exports = class Battle {
       || !(q2 in this.grid) || !(r2 in this.grid[q2])) return;
     
     if (playerNum == 2) {
-      q1 = -q1, r1 = -r2, q2 = -q2, r2 = -r2;
+      q1 = -q1, r1 = -r1, q2 = -q2, r2 = -r2;
     }
     if (this.grid[q2][r2].name != 'Empty'
       || this.turn != playerNum
@@ -112,11 +112,11 @@ module.exports = class Battle {
     this.emitUnitUpdate(this.grid[q2][r2]);
 
     // ! TESTING: auto pass turn after move
-    this.handlePassTurn();
+    this.handleEndTurn();
   }
 
   // Just testing right now. Will be called when client passes turn.
-  handlePassTurn() {
+  handleEndTurn() {
     this.turn = (this.turn % 2) + 1;
     this.emitTurnUpdate(this.turn);
 
