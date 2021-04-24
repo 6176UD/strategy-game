@@ -24,8 +24,8 @@ class InfoMenu extends Component {
       <div>
         <p>Unit: {name} ({owns ? 'Player' : 'Enemy'})</p>
         <p>Health: {health}</p>
-        {turn && owns && moves && <p>Moves: {moves}</p>}
-        {turn && owns && moves && <button onClick={this.handleMoveClick}>Move</button>}
+        {turn && owns && (moves > 0) && <p>Moves: {moves}</p>}
+        {turn && owns && (moves > 0) && <button onClick={this.handleMoveClick}>Move</button>}
       </div>
     );
   }
