@@ -91,6 +91,4 @@ exports.startBattle = room => {
     player.socket.emit('room-status', room.status);
   }
   room.battle = new Battle(room);
-  
-  console.log(room.battle);
 }

@@ -33,7 +33,6 @@ module.exports = class Battle {
     this.grid[0][-MAP_RADIUS + 2] = new Peasant(this, 2, 0, -MAP_RADIUS + 2);
     this.grid[0][MAP_RADIUS - 2].resetMoves();
     this.grid[0][-MAP_RADIUS + 2].resetMoves();
-    console.log(this.grid[0][MAP_RADIUS - 2].moves);
     this.emitUnitUpdate(this.grid[0][MAP_RADIUS - 2]);
     this.emitUnitUpdate(this.grid[0][-MAP_RADIUS + 2]);
 
