@@ -56,21 +56,22 @@ class Battle extends Component {
     this.handleUnitClick = this.handleUnitClick.bind(this);
   }
 
-  // ! FIXME: Messy, slow, and non-reacty
   handleUnitUpdate(unit) {
     const img = NAME_TO_IMG[unit.owns][unit.name];
     console.log(this);
-    const grid = this.state.grid;
-    grid[unit.q][unit.r] = <Unit
-      q={unit.q} r={unit.r}
-      name={unit.name}
-      health={unit.health}
-      moves={unit.moves}
-      owns={unit.owns}
-      img={img}
-      battleRef={this}
-    />
-    this.setState({ grid: grid });
+    this.setState(prevState => {
+      const grid = Object.assign({}, prevState.grid);
+      grid[unit.q][unit.r] = <Unit
+        q={unit.q} r={unit.r}
+        name={unit.name}
+        health={unit.health}
+        moves={unit.moves}
+        owns={unit.owns}
+        img={img}
+        battleRef={this}
+      />
+      return { grid };
+    })
   }
 
   handleUnitClick(q, r) {
@@ -79,8 +80,7 @@ class Battle extends Component {
       case 'sel':
         this.setState({
           sel: true,
-          selq: q,
-          selr: r
+          selq: q, selr: r
         });
         break;
       case 'move':
