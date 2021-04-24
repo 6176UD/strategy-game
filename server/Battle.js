@@ -31,8 +31,6 @@ module.exports = class Battle {
     // ! TESTING peasants
     this.grid[0][MAP_RADIUS - 2] = new Peasant(this, 1, 0, MAP_RADIUS - 2);
     this.grid[0][-MAP_RADIUS + 2] = new Peasant(this, 2, 0, -MAP_RADIUS + 2);
-    this.grid[0][MAP_RADIUS - 2].resetMoves();
-    this.grid[0][-MAP_RADIUS + 2].resetMoves();
     this.emitUnitUpdate(this.grid[0][MAP_RADIUS - 2]);
     this.emitUnitUpdate(this.grid[0][-MAP_RADIUS + 2]);
 
@@ -97,7 +95,6 @@ module.exports = class Battle {
   }
 
   // Called when client moves a unit
-  // ! FIXME just handling a lot of stuff instead of in the class because no time
   handleMove(playerNum, q1, r1, q2, r2) {
     if (!(q1 in this.grid) || !(r1 in this.grid[q1])
       || !(q2 in this.grid) || !(r2 in this.grid[q2])) return;
@@ -120,7 +117,6 @@ module.exports = class Battle {
   }
 
   // Called when client attacks with a unit
-  // ! FIXME just handling a lot of stuff instead of in the class because no time
   handleAttack(playerNum, q1, r1, q2, r2) {
     if (!(q1 in this.grid) || !(r1 in this.grid[q1])
       || !(q2 in this.grid) || !(r2 in this.grid[q2])) return;
@@ -136,6 +132,7 @@ module.exports = class Battle {
     this.grid[q1][r1].canAttackThisTurn = false;
     this.emitUnitUpdate(this.grid[q1][r1]);
   }
+
   // Called when player ends their turn
   handleEndTurn(playerNum) {
     if (playerNum !== this.turn) return;
