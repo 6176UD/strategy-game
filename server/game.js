@@ -75,13 +75,6 @@ exports.removePlayer = socket => {
     }
   }
   delete roomKeys[socket.id];
-
-  // ! DEBUGGING
-  // if (roomKey in rooms) {
-  //   for (const x of Object.entries(rooms[roomKey])) {
-  //     console.log(x);
-  //   }
-  // }
 }
 
 exports.startBattle = room => {

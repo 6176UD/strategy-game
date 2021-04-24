@@ -9,7 +9,7 @@ const SIZE = 40;
 class Selector extends Component {
   render() {
     const q = this.props.q, r = this.props.r;
-    const x = SIZE * 3./2 * q;
+    const x = SIZE * 3. / 2 * q;
     const y = SIZE * (Math.sqrt(3) / 2 * q + Math.sqrt(3) * r);
     const style = {
       position: 'absolute',

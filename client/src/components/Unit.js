@@ -28,10 +28,6 @@ class Unit extends Component {
     const imgStyle = {
       position: 'absolute'
     }
-    const textStyle = {
-      position: 'absolute',
-      left: `${SIZE / 2}px`
-    }
     return (
       <div style={style}>
         <div></div>
