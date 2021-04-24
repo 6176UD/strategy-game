@@ -37,10 +37,6 @@ io.on('connection', async socket => {
       return;  // Room is full
     }
     console.info(`A player joined room "${roomKey}"`);
-
-    socket.on('action', data => {
-      // TODO: handle player action
-    });
   });
 
   socket.on('disconnect', () => {

@@ -1,6 +1,8 @@
-class Empty extends Unit {
-  constructor(roomKey, player, q, r) {
-    super('Empty', 1, roomKey, player, q, r);
+const Unit = require('./Unit');
+
+module.exports = class Empty extends Unit {
+  constructor(battle, q, r) {
+    super('Empty', 1, 0, battle, 0, q, r);
   }
 
   // Cannot attack
@@ -8,10 +10,6 @@ class Empty extends Unit {
     return false;
   }
 
-  attack(q, r) {
-    return;
-  }
-
-  takeDamage(dmg) {
-  }
+  // Does not take damage
+  takeDamage(dmg) {}
 }
