@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Unit from './Unit';
-import Selector from './Selector';
+import UnitSelector from './UnitSelector';
 import InfoMenu from './InfoMenu';
 
 // Import tile images
@@ -46,13 +46,14 @@ class Battle extends Component {
           moves={0}
           owns={false}
           img={emptyImg}
-          battleRef={this}
+          battle={this}
         />;
       }
     }
     this.state = {
       grid: grid,
-      sel: false,
+      unitSel: false,
+      cardSel: false,
       turn: false,
       action: 'sel'
     }
@@ -63,6 +64,8 @@ class Battle extends Component {
     this.handleEndTurnClick = this.handleEndTurnClick.bind(this);
     this.handleMoveClick = this.handleMoveClick.bind(this);
     this.handleAttackClick = this.handleAttackClick.bind(this);
+    this.handleCardClick = this.handleCardClick.bind(this);
+    this.handleSummonClick = this.handleSummonClick.bind(this);
   }
 
   handleUnitUpdate(unit) {
@@ -79,7 +82,7 @@ class Battle extends Component {
         canAttackThisTurn={unit.canAttackThisTurn}
         owns={unit.owns}
         img={img}
-        battleRef={this}
+        battle={this}
       />
       return { grid };
     })
@@ -89,30 +92,36 @@ class Battle extends Component {
     switch (this.state.action) {
       case 'sel':
         this.setState({
-          sel: true,
-          selq: q, selr: r
+          unitSel: { q: q, r: r },
+          cardSel: null,
         });
         break;
       case 'move':
         // Emit move, then deselect
         this.props.socket.emit('move', {
-          q1: this.state.selq, r1: this.state.selr,
+          q1: this.state.unitSel.q, r1: this.state.unitSel.r,
           q2: q, r2: r
         });
         this.setState({
-          sel: false,
+          unitSel: null,
           action: 'sel'
         });
         break;
       case 'attack':
         // Emit attack, then deselect
         this.props.socket.emit('attack', {
-          q1: this.state.selq, r1: this.state.selr,
+          q1: this.state.unitSel.q, r1: this.state.unitSel.r,
           q2: q, r2: r
         });
         this.setState({
-          sel: false,
+          unitSel: null,
           action: 'sel'
+        });
+        break;
+      case 'summon':
+        this.props.socket.emit('summon', {
+          cardNum: this.state.cardSel,
+          q 
         });
         break;
       default: break;
@@ -129,6 +138,17 @@ class Battle extends Component {
 
   handleAttackClick() {
     this.setState({ action: 'attack' });
+  }
+
+  handleCardClick(cardNum) {
+    this.setState({
+      unitSel: false,
+      cardSel: cardNum
+    });
+  }
+
+  handleSummonClick() {
+    this.setState({ action: 'summon' });
   }
 
   componentDidMount() {
@@ -149,10 +169,10 @@ class Battle extends Component {
           units.push(unit);
         }
       }
-      if (this.state.sel) {
-        units.push(<Selector
-          key='selector'
-          q={this.state.selq} r={this.state.selr}
+      if (this.state.unitSel) {
+        units.push(<UnitSelector
+          key='unit-selector'
+          q={this.state.unitSel.q} r={this.state.unitSel.r}
         />);
       }
     }
@@ -162,11 +182,11 @@ class Battle extends Component {
         <p>{this.state.turn ? 'Your' : "Opponent's"} Turn</p>
         {this.state.turn && <button onClick={this.handleEndTurnClick}>End Turn</button>}
         {units}
-        {this.state.sel &&
+        {this.state.unitSel &&
         <InfoMenu
-          unit={this.state.grid[this.state.selq][this.state.selr]}
+          unit={this.state.grid[this.state.unitSel.q][this.state.unitSel.r]}
           turn={this.state.turn}
-          battleRef={this}
+          battle={this}
         />}
       </div>
     );

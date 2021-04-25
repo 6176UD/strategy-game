@@ -12,7 +12,7 @@ class Unit extends Component {
   }
 
   handleClick() {
-    this.props.battleRef.handleUnitClick(this.props.q, this.props.r);
+    this.props.battle.handleUnitClick(this.props.q, this.props.r);
   }
 
   render() {

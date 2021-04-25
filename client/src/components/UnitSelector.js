@@ -6,7 +6,7 @@ import img from '../img/selector.png';
 const SIZE = 40;
 
 // Indicator to show the selected tile.
-class Selector extends Component {
+class UnitSelector extends Component {
   render() {
     const q = this.props.q, r = this.props.r;
     const x = SIZE * 3. / 2 * q;
@@ -28,4 +28,4 @@ class Selector extends Component {
   }
 }
 
-export default Selector;
+export default UnitSelector;

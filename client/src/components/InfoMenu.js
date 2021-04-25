@@ -8,10 +8,10 @@ class InfoMenu extends Component {
   }
 
   handleMoveClick() {
-    this.props.battleRef.handleMoveClick();
+    this.props.battle.handleMoveClick();
   }
   handleAttackClick() {
-    this.props.battleRef.handleAttackClick();
+    this.props.battle.handleAttackClick();
   }
 
   render() {
