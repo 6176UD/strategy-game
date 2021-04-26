@@ -3,25 +3,26 @@ import React, { Component } from 'react';
 import hexImg from '../img/hexagon.png';
 import highlightImg from '../img/highlight.png';
 
-// Radius of a tile
-const SIZE = 40;
+const SIZE = 50;
 
-// Displays a unit tile. Does NOT handle any game logic.
-class Unit extends Component {
+// Like Unit but for cards
+// ! FIXME repeated code :(
+class Card extends Component {
+  constructor(props) {
+    super(props);
+  }
   render() {
-    const { q, r, name, img, hasTurn, canAttack, canAttackThisTurn, highlighted } = this.props;
-    const x = SIZE * 3./2 * q;
-    const y = SIZE * (Math.sqrt(3) / 2 * q + Math.sqrt(3) * r);
+    const { img, owns, resources, cost, idx, highlighted } = this.props;
     const style = {
-      position: 'absolute',
-      left: `${x + SIZE * 12 + 150}px`,
-      top: `${y + SIZE * 12}px`,
-    };
+      position: 'fixed',
+      left: `15px`,
+      bottom: `${(2 * SIZE - 10) * (idx + 1) + 15}px`,
+    }
     const hexStyle = { position: 'absolute' };
     const imgStyle = {
       pointerEvents: 'none',
       position: 'absolute',
-      opacity: (name === 'Empty' || !hasTurn || canAttack === canAttackThisTurn) ? 1 : 0.5
+      opacity: cost <= resources ? 1 : 0.5
     };
     const highlightStyle = {
       pointerEvents: 'none',
@@ -36,7 +37,7 @@ class Unit extends Component {
             alt=''
             width={SIZE * 2}
             height={SIZE * 2}
-            onClick={() => this.props.handleClick(this.props.q, this.props.r)}
+            onClick={() => this.props.handleClick(owns, idx)}
           />
         </div>
         {/* In the case of an Empty tile, do not display if img is null */}
@@ -50,7 +51,7 @@ class Unit extends Component {
             />
           </div>
         }
-        {/* If tile is highlighted, overlay a highlight image */}
+        {/* If card is highlighted, overlay a highlight image */}
         {highlighted &&
           <div style={highlightStyle}>
             <img
@@ -66,4 +67,4 @@ class Unit extends Component {
   }
 }
 
-export default Unit;
+export default Card;

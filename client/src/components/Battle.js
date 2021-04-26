@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import Unit from './Unit';
-import UnitSelector from './UnitSelector';
+import Card from './Card';
 import InfoMenu from './InfoMenu';
 
 import Hex from '../Hex';
@@ -9,11 +9,29 @@ import UnitImages from '../UnitImages';
 import CanAttackTarget from '../AttackPatterns';
 
 const MAP_RADIUS = 7;
+const NUM_CARDS = 5;
 
 // Handles client-side battle logic.
 class Battle extends Component {
   constructor() {
     super();
+
+    this.handleUnitUpdate = this.handleUnitUpdate.bind(this);
+    this.handleResourcesUpdate = this.handleResourcesUpdate.bind(this);
+    this.handleTurnUpdate = this.handleTurnUpdate.bind(this);
+    this.handleUnitSelect = this.handleUnitSelect.bind(this);
+    this.deselect = this.deselect.bind(this);
+    this.handleUnitMove = this.handleUnitMove.bind(this);
+    this.handleUnitAttack = this.handleUnitAttack.bind(this);
+    this.handleUnitSummon = this.handleUnitSummon.bind(this);
+    this.handleUnitClick = this.handleUnitClick.bind(this);
+    this.handleCardClick = this.handleCardClick.bind(this);
+    this.handleEndTurnClick = this.handleEndTurnClick.bind(this);
+    this.handleMoveClick = this.handleMoveClick.bind(this);
+    this.handleAttackClick = this.handleAttackClick.bind(this);
+    this.handleSummonClick = this.handleSummonClick.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+
     // Mirror server by initalizing grid as empty units
     const grid = {};
     for (let q = -MAP_RADIUS; q <= MAP_RADIUS; q++) {
@@ -25,34 +43,21 @@ class Battle extends Component {
           key={[q, r]}
           name='Empty'
           q={q} r={r}
-          battle={this}
+          handleClick={this.handleUnitClick}
         />;
       }
     }
     this.state = {
       grid: grid,
-      cards: {},
+      cards: {
+        true: Array(NUM_CARDS).fill(null),
+        false: Array(NUM_CARDS).fill(null)
+      },
       unitSel: null,
       cardSel: null,
       turn: false,
       action: 'sel'
     }
-
-    this.handleUnitUpdate = this.handleUnitUpdate.bind(this);
-    this.handleTurnUpdate = this.handleTurnUpdate.bind(this);
-    this.handleUnitSelect = this.handleUnitSelect.bind(this);
-    this.handleCardSelect = this.handleCardSelect.bind(this);
-    this.deselect = this.deselect.bind(this);
-    this.handleUnitMove = this.handleUnitMove.bind(this);
-    this.handleUnitAttack = this.handleUnitAttack.bind(this);
-    this.handleUnitSummon = this.handleUnitSummon.bind(this);
-    this.handleUnitClick = this.handleUnitClick.bind(this);
-    this.handleEndTurnClick = this.handleEndTurnClick.bind(this);
-    this.handleMoveClick = this.handleMoveClick.bind(this);
-    this.handleAttackClick = this.handleAttackClick.bind(this);
-    this.handleCardClick = this.handleCardClick.bind(this);
-    this.handleSummonClick = this.handleSummonClick.bind(this);
-    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   // Server update handling
@@ -63,38 +68,32 @@ class Battle extends Component {
       const grid = Object.assign({}, prevState.grid);
       grid[unit.q][unit.r] = <Unit
         key={[unit.q, unit.r]}
-        q={unit.q} r={unit.r}
-        name={unit.name}
-        health={unit.health}
-        maxHealth={unit.maxHealth}
-        movesPerTurn={unit.movesPerTurn}
-        moves={unit.moves}
-        canAttack={unit.canAttack}
-        canAttackThisTurn={unit.canAttackThisTurn}
-        owns={unit.owns}
+        {...unit}
+        hasTurn={prevState.turn === unit.owns}
+        higlighted={false}
         img={UnitImages[unit.owns][unit.name]}
-        battle={this}
+        handleClick={this.handleUnitClick}
       />
       return { grid };
     });
   }
 
   handleCardUpdate(card) {
-    // this.setState(prevState => {
-    //   const cards = Object.assign({}, prevState.cards);
-    //   cards[card.owns][card.num] = <Card
-    //     key={card.num}
-    //     num={card.num}
-    //     name={card.name}
-    //     cost={card.cost}
-    //     maxHealth={card.maxHealth}
-    //     movesPerTurn={card.movesPerTurn}
-    //     canAttack={card.canAttack}
-    //     owns={card.owns}
-    //     img={CardImages[unit.owns][unit.name]}
-    //     battle={this}
-    //   />
-    // });
+    this.setState(prevState => {
+      const cards = Object.assign({}, prevState.cards);
+      cards[card.owns][card.idx] = <Card
+        key={'card' + (card.owns ? 'player' : 'enemy') + card.idx}
+        {...card}
+        higlighted={false}
+        img={UnitImages[card.owns][card.name]}
+        handleClick={this.handleCardClick}
+      />
+      return { cards };
+    });
+  }
+
+  handleResourcesUpdate(resources) {
+    this.setState({ resources });
   }
 
   handleTurnUpdate(turn) {
@@ -110,6 +109,7 @@ class Battle extends Component {
           grid[q][r] = <Unit
             key={[q, r]}
             {...unit.props}
+            hasTurn={turn === unit.props.owns}
             moves={needsReset ? unit.props.movesPerTurn : unit.props.moves}
             canAttackThisTurn={needsReset ? unit.props.canAttack : unit.props.canAttackThisTurn}
           />
@@ -185,9 +185,9 @@ class Battle extends Component {
     }
   }
 
-  handleCardSelect(cardNum) {
+  handleCardClick(owns, idx) {
     this.deselect();
-    this.setState({ cardSel: this.state.cards[cardNum] });
+    this.setState({ cardSel: this.state.cards[owns][idx] });
   }
 
   handleEndTurnClick() {
@@ -200,13 +200,6 @@ class Battle extends Component {
 
   handleAttackClick() {
     this.setState({ action: 'attack' });
-  }
-
-  handleCardClick(cardNum) {
-    this.setState({
-      unitSel: null,
-      cardSel: cardNum
-    });
   }
 
   handleSummonClick() {
@@ -228,14 +221,25 @@ class Battle extends Component {
           this.handleAttackClick();
         }
       }
+      const { cardSel, resources } = this.state;
+      if (cardSel && cardSel.props.owns
+          && cardSel.props.cost <= resources[true]) {
+          this.handleSummonClick();
+      }
     }
   }
 
   // ==================================================================================
 
   componentDidMount() {
-    this.props.socket.on('unit-update', data => {
-      this.handleUnitUpdate(data);
+    this.props.socket.on('unit-update', unit => {
+      this.handleUnitUpdate(unit);
+    });
+    this.props.socket.on('card-update', card => {
+      this.handleCardUpdate(card);
+    });
+    this.props.socket.on('resources-update', resources => {
+      this.handleResourcesUpdate(resources);
     });
     this.props.socket.on('turn-update', b => {
       this.handleTurnUpdate(b);
@@ -249,31 +253,40 @@ class Battle extends Component {
   }
 
   render() {
-    const { grid, unitSel, action, turn } = this.state;
+    const { grid, cards, unitSel, cardSel, action, turn } = this.state;
     const gridComponents = [];
     for (let q = -MAP_RADIUS; q <= MAP_RADIUS; q++) {
       let r1 = Math.max(-MAP_RADIUS, -q - MAP_RADIUS);
       let r2 = Math.min(MAP_RADIUS, -q + MAP_RADIUS);
       for (let r = r1; r <= r2; r++) {
-        // Add each unit on the grid to be rendered
         const unit = grid[q][r]
-        gridComponents.push(unit);
 
         // If a unit is selected highlight it.
         // If moving a unit, highlight all tiles it can move to.
         // If attacking with a unit, highlight all tiles it can attack.
-        if (unitSel) {
-          const selq = unitSel.props.q, selr = unitSel.props.r;
-          if ((unitSel && selq === q && selr === r)
-            || (action === 'move'
-                && unit.props.name === 'Empty'
-                && Hex.dist(selq, selr, q, r) <= unitSel.props.moves)
-            || (action === 'attack' && CanAttackTarget[unitSel.props.name](unitSel, q, r))) {
-            gridComponents.push(<UnitSelector key={['selector', q, r]} q={q} r={r} />);
-          }
+        if ((unitSel && unitSel.props.q === q && unitSel.props.r === r)
+          || (action === 'move'
+              && unit.props.name === 'Empty'
+              && Hex.dist(unitSel.props.q, unitSel.props.r, q, r) <= unitSel.props.moves)
+          || (action === 'attack' && CanAttackTarget[unitSel.props.name](unitSel, q, r))) {
+          gridComponents.push(<Unit
+            key={[unit.props.q, unit.props.r]}
+            {...unit.props}
+            highlighted={true}
+          />);
+        } else {
+          // Otherwise, add each unit on the grid as-is to be rendered
+          gridComponents.push(unit);
         }
       }
     }
+    const cardComponents = [];
+    for (const b of [true, false]) {
+      for (const card of cards[b]) {
+        cardComponents.push(card);
+      }
+    }
+    console.log(turn);
     return (
       <div>
         <p>Battle Zone! (WIP)</p>
@@ -283,11 +296,11 @@ class Battle extends Component {
         <InfoMenu
           unit={grid[unitSel.props.q][unitSel.props.r]}
           turn={turn}
-          battle={this}
+          handleMoveClick={this.handleMoveClick}
+          handleAttackClick={this.handleAttackClick}
         />}
-        <p>Player cards:</p>
-        <p>Enemy cards:</p>
         {gridComponents}
+        {cardComponents}
       </div>
     );
   }

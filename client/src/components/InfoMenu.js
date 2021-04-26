@@ -1,19 +1,6 @@
 import React, { Component } from 'react';
 
 class InfoMenu extends Component {
-  constructor(props) {
-    super(props);
-    this.handleMoveClick = this.handleMoveClick.bind(this);
-    this.handleAttackClick = this.handleAttackClick.bind(this);
-  }
-
-  handleMoveClick() {
-    this.props.battle.handleMoveClick();
-  }
-  handleAttackClick() {
-    this.props.battle.handleAttackClick();
-  }
-
   render() {
     const { owns, name, health, maxHealth, moves, movesPerTurn, canAttack, canAttackThisTurn } = this.props.unit.props;
     const turn = this.props.turn;
@@ -29,7 +16,7 @@ class InfoMenu extends Component {
             <p>Moves per turn: {movesPerTurn}</p>
             {(turn === owns) && <p>Moves: {moves}</p>}
             {turn && owns && (moves > 0) &&
-              <button onClick={this.handleMoveClick} >Move</button>}
+              <button onClick={this.props.handleMoveClick} >Move</button>}
           </div> : <p>Cannot move</p>
         }
         {canAttack ?
@@ -40,7 +27,7 @@ class InfoMenu extends Component {
               ) : <p>Can attack next turn</p>
             }
             {turn && owns && canAttackThisTurn &&
-              <button onClick={this.handleAttackClick}>Attack</button>
+              <button onClick={this.props.handleAttackClick}>Attack</button>
             }
           </div> : <p>Cannot attack</p>
         }
