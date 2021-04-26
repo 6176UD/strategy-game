@@ -103,14 +103,14 @@ class Battle extends Component {
 
   handleUnitSelect(q, r) {
     this.setState({
-      unitSel: { q: q, r: r },
+      unitSel: this.state.grid[q][r],
       cardSel: null,
     });
   }
 
   handleUnitMove(q, r) {
     this.props.socket.emit('move', {
-      q1: this.state.unitSel.q, r1: this.state.unitSel.r,
+      q1: this.state.unitSel.props.q, r1: this.state.unitSel.props.r,
       q2: q, r2: r
     });
     this.setState({
@@ -121,7 +121,7 @@ class Battle extends Component {
 
   handleUnitAttack(q, r) {
     this.props.socket.emit('attack', {
-      q1: this.state.unitSel.q, r1: this.state.unitSel.r,
+      q1: this.state.unitSel.props.q, r1: this.state.unitSel.props.r,
       q2: q, r2: r
     });
     this.setState({
@@ -200,18 +200,19 @@ class Battle extends Component {
       let r2 = Math.min(MAP_RADIUS, -q + MAP_RADIUS);
       for (let r = r1; r <= r2; r++) {
         // Add each unit on the grid to be rendered
-        gridComponents.push(grid[q][r]);
+        const unit = grid[q][r]
+        gridComponents.push(unit);
 
         // If a unit is selected highlight it.
         // If moving a unit, highlight all tiles it can move to.
         // If attacking with a unit, highlight all tiles it can attack.
         if (unitSel) {
-          const unit = grid[unitSel.q][unitSel.r];
-          if ((unitSel && unitSel.q === q && unitSel.r === r)
+          const selq = unitSel.props.q, selr = unitSel.props.r;
+          if ((unitSel && selq === q && selr === r)
             || (action === 'move'
                 && unit.props.name === 'Empty'
-                && Hex.dist(unitSel.q, unitSel.r, q, r) <= unit.props.moves)
-            || (action === 'attack' && CanAttackTarget[unit.props.name](unit, q, r))) {
+                && Hex.dist(selq, selr, q, r) <= unitSel.props.moves)
+            || (action === 'attack' && CanAttackTarget[unitSel.props.name](unitSel, q, r))) {
             gridComponents.push(<UnitSelector key={['selector', q, r]} q={q} r={r} />);
           }
         }
@@ -225,7 +226,7 @@ class Battle extends Component {
         {gridComponents}
         {unitSel &&
         <InfoMenu
-          unit={grid[unitSel.q][unitSel.r]}
+          unit={grid[unitSel.props.q][unitSel.props.r]}
           turn={turn}
           battle={this}
         />}
