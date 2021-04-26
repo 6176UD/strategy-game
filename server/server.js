@@ -25,6 +25,11 @@ io.on('connection', async socket => {
   console.info('Connection:', socket.request.connection._peername);
 
   socket.on('join', async data => {
+    if (!('roomKey' in data)) {
+      // This person is trying to crash the server >:(
+      console.warn('ATTENTION: Scummy person detected!');
+      return;
+    }
     const roomKey = data.roomKey.toString();
     if (roomKey.length > 20) {
       // This person is trying to hack room keys >:(

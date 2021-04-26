@@ -21,14 +21,15 @@ class InfoMenu extends Component {
       return (<div><p>Empty Tile</p></div>);
     }
     return (
-      <div>
+      <div onKeyDown={this.onKeyPressed} tabIndex={0}>
         <p>Unit: {name} ({owns ? 'Player' : 'Enemy'})</p>
         <p>Health: {health} / {maxHealth}</p>
         {(movesPerTurn > 0) ?
           <div>
             <p>Moves per turn: {movesPerTurn}</p>
             {(turn === owns) && <p>Moves: {moves}</p>}
-            {turn && owns && (moves > 0) && <button onClick={this.handleMoveClick}>Move</button>}
+            {turn && owns && (moves > 0) &&
+              <button onClick={this.handleMoveClick} >Move</button>}
           </div> : <p>Cannot move</p>
         }
         {canAttack ?

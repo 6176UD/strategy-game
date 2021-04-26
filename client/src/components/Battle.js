@@ -40,6 +40,7 @@ class Battle extends Component {
     this.handleUnitUpdate = this.handleUnitUpdate.bind(this);
     this.handleTurnUpdate = this.handleTurnUpdate.bind(this);
     this.handleUnitSelect = this.handleUnitSelect.bind(this);
+    this.deselect = this.deselect.bind(this);
     this.handleUnitMove = this.handleUnitMove.bind(this);
     this.handleUnitAttack = this.handleUnitAttack.bind(this);
     this.handleUnitSummon = this.handleUnitSummon.bind(this);
@@ -49,6 +50,7 @@ class Battle extends Component {
     this.handleAttackClick = this.handleAttackClick.bind(this);
     this.handleCardClick = this.handleCardClick.bind(this);
     this.handleSummonClick = this.handleSummonClick.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
   }
 
   // Server update handling
@@ -96,6 +98,8 @@ class Battle extends Component {
       }
       return { grid, turn };
     });
+    // unitSel is invalid now that grid has changed
+    this.deselect();
   }
 
   // Helper functions for handleUnitClick
@@ -108,15 +112,20 @@ class Battle extends Component {
     });
   }
 
+  deselect() {
+    this.setState({
+      unitSel: null,
+      cardSel: null,
+      action: 'sel'
+    });
+  }
+
   handleUnitMove(q, r) {
     this.props.socket.emit('move', {
       q1: this.state.unitSel.props.q, r1: this.state.unitSel.props.r,
       q2: q, r2: r
     });
-    this.setState({
-      unitSel: null,
-      action: 'sel'
-    });
+    this.deselect();
   }
 
   handleUnitAttack(q, r) {
@@ -124,10 +133,7 @@ class Battle extends Component {
       q1: this.state.unitSel.props.q, r1: this.state.unitSel.props.r,
       q2: q, r2: r
     });
-    this.setState({
-      unitSel: null,
-      action: 'sel'
-    });
+    this.deselect();
   }
 
   // TODO not fully implemented
@@ -136,6 +142,7 @@ class Battle extends Component {
       cardNum: this.state.cardSel,
       q: q, r: r 
     });
+    this.deselect();
   }
 
   // Click handling
@@ -181,6 +188,24 @@ class Battle extends Component {
     this.setState({ action: 'summon' });
   }
 
+  // Key shortcuts
+  handleKeyDown(e) {
+    if (e.key === 'Escape') {
+      this.deselect();
+    } else if (e.key === 'e') {
+      this.handleEndTurnClick();
+    } else if (this.state.turn && this.state.action === 'sel') {
+      const { unitSel } = this.state;
+      if (unitSel && unitSel.props.owns) {
+        if (e.key === 'g' &&  unitSel.props.moves > 0) {
+          this.handleMoveClick();
+        } else if (e.key === 'a' && unitSel.props.canAttackThisTurn) {
+          this.handleAttackClick();
+        }
+      }
+    }
+  }
+
   // ==================================================================================
 
   componentDidMount() {
@@ -190,6 +215,12 @@ class Battle extends Component {
     this.props.socket.on('turn-update', b => {
       this.handleTurnUpdate(b);
     });
+    // Listen for key events
+    document.addEventListener('keydown', this.handleKeyDown);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('keydown', this.handleKeyDown);
   }
 
   render() {
