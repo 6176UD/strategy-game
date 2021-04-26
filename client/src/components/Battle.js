@@ -31,6 +31,7 @@ class Battle extends Component {
     }
     this.state = {
       grid: grid,
+      cards: {},
       unitSel: null,
       cardSel: null,
       turn: false,
@@ -40,6 +41,7 @@ class Battle extends Component {
     this.handleUnitUpdate = this.handleUnitUpdate.bind(this);
     this.handleTurnUpdate = this.handleTurnUpdate.bind(this);
     this.handleUnitSelect = this.handleUnitSelect.bind(this);
+    this.handleCardSelect = this.handleCardSelect.bind(this);
     this.deselect = this.deselect.bind(this);
     this.handleUnitMove = this.handleUnitMove.bind(this);
     this.handleUnitAttack = this.handleUnitAttack.bind(this);
@@ -70,11 +72,29 @@ class Battle extends Component {
         canAttack={unit.canAttack}
         canAttackThisTurn={unit.canAttackThisTurn}
         owns={unit.owns}
-        battle={this}
         img={UnitImages[unit.owns][unit.name]}
+        battle={this}
       />
       return { grid };
     });
+  }
+
+  handleCardUpdate(card) {
+    // this.setState(prevState => {
+    //   const cards = Object.assign({}, prevState.cards);
+    //   cards[card.owns][card.num] = <Card
+    //     key={card.num}
+    //     num={card.num}
+    //     name={card.name}
+    //     cost={card.cost}
+    //     maxHealth={card.maxHealth}
+    //     movesPerTurn={card.movesPerTurn}
+    //     canAttack={card.canAttack}
+    //     owns={card.owns}
+    //     img={CardImages[unit.owns][unit.name]}
+    //     battle={this}
+    //   />
+    // });
   }
 
   handleTurnUpdate(turn) {
@@ -86,14 +106,13 @@ class Battle extends Component {
         let r2 = Math.min(MAP_RADIUS, -q + MAP_RADIUS);
         for (let r = r1; r <= r2; r++) {
           const unit = grid[q][r];
-          if (unit.props.name !== 'Empty' && unit.props.owns === turn) {
-            grid[q][r] = <Unit
-              key={[q, r]}
-              {...unit.props}
-              moves={unit.props.movesPerTurn}
-              canAttackThisTurn={unit.props.canAttack}
-            />
-          }
+          const needsReset = unit.props.name !== 'Empty' && unit.props.owns === turn;
+          grid[q][r] = <Unit
+            key={[q, r]}
+            {...unit.props}
+            moves={needsReset ? unit.props.movesPerTurn : unit.props.moves}
+            canAttackThisTurn={needsReset ? unit.props.canAttack : unit.props.canAttackThisTurn}
+          />
         }
       }
       return { grid, turn };
@@ -139,7 +158,7 @@ class Battle extends Component {
   // TODO not fully implemented
   handleUnitSummon(q, r) {
     this.props.socket.emit('summon', {
-      cardNum: this.state.cardSel,
+      cardNum: this.state.cardSel.num,
       q: q, r: r 
     });
     this.deselect();
@@ -160,9 +179,15 @@ class Battle extends Component {
         this.handleUnitAttack(q, r);
         break;
       case 'summon':
+        this.handleUnitSummon(q, r);
         break;
       default: break;
     }
+  }
+
+  handleCardSelect(cardNum) {
+    this.deselect();
+    this.setState({ cardSel: this.state.cards[cardNum] });
   }
 
   handleEndTurnClick() {
@@ -254,13 +279,15 @@ class Battle extends Component {
         <p>Battle Zone! (WIP)</p>
         <p>{turn ? 'Your' : "Opponent's"} Turn</p>
         {turn && <button onClick={this.handleEndTurnClick}>End Turn</button>}
-        {gridComponents}
         {unitSel &&
         <InfoMenu
           unit={grid[unitSel.props.q][unitSel.props.r]}
           turn={turn}
           battle={this}
         />}
+        <p>Player cards:</p>
+        <p>Enemy cards:</p>
+        {gridComponents}
       </div>
     );
   }

@@ -75,6 +75,11 @@ module.exports = class Battle {
     }
   }
 
+  // Sends update to players in room that a card has been updated
+  emitCardUpdate(card) {
+    // TODO
+  }
+
   // Emits that it is now player x's turn
   emitTurnUpdate(x) {
     for (const player of Object.values(this.room.players)) {

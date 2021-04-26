@@ -25,13 +25,18 @@ class Unit extends Component {
       left: `${x + SIZE * 15}px`,
       top: `${y + SIZE * 12}px`,
     };
+    const hexStyle = { position: 'absolute' };
+    console.log(this.props, this.props.owns, this.props.battle.state.turn);
     const imgStyle = {
-      position: 'absolute'
-    }
+      position: 'absolute',
+      opacity: (this.props.name === 'Empty'
+        || this.props.owns !== this.props.battle.state.turn
+        || this.props.canAttack === this.props.canAttackThisTurn) ? 1 : 0.5
+    };
     return (
       <div style={style}>
         {/* Background hexagon tile underneath */}
-        <div style={imgStyle}>
+        <div style={hexStyle}>
           <img
             src={hexImg}
             alt=''
