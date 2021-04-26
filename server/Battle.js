@@ -62,10 +62,10 @@ module.exports = class Battle {
         r = -r;
       }
       player.socket.emit('unit-update', {
-        'q': q,
-        'r': r,
+        'q': q, 'r': r,
         'name': unit.name,
         'health': unit.health,
+        'maxHealth': unit.maxHealth,
         'movesPerTurn': unit.movesPerTurn,
         'moves': unit.moves,
         'canAttack': unit.canAttack,
@@ -86,7 +86,7 @@ module.exports = class Battle {
   dealDamage(q, r, dmg) {
     if (q in this.grid && r in this.grid[q]) {
       if (this.grid[q][r].name == 'Empty') return;
-      this.grid[q][r].takeDamage(dmg);
+      this.grid[q][r].health -= dmg;
       if (this.grid[q][r].health < 1) {
         this.grid[q][r] = new Empty(this, q, r);
       }
@@ -137,19 +137,20 @@ module.exports = class Battle {
   handleEndTurn(playerNum) {
     if (playerNum !== this.turn) return;
     this.turn = (this.turn % 2) + 1;
-    this.emitTurnUpdate(this.turn);
-
+    // Reset moves and attack of active player's units
     for (let q = -MAP_RADIUS; q <= MAP_RADIUS; q++) {
       let r1 = Math.max(-MAP_RADIUS, -q - MAP_RADIUS);
       let r2 = Math.min(MAP_RADIUS, -q + MAP_RADIUS);
       for (let r = r1; r <= r2; r++) {
         if (this.grid[q][r].playerNum == this.turn) {
-          this.grid[q][r].resetMoves();
-          this.grid[q][r].resetAttack();
-          // ! FIXME: this should just be mirrored by the frontend to reduce emits
-          this.emitUnitUpdate(this.grid[q][r]);
+          this.grid[q][r].moves = this.grid[q][r].movesPerTurn;
+          this.grid[q][r].canAttackThisTurn = this.grid[q][r].canAttack;
         }
       }
     }
+
+    // Tell client the turn has end
+    // Client is responsible for mirroring the game logic
+    this.emitTurnUpdate(this.turn);
   }
 }

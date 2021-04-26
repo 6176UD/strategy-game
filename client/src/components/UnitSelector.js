@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import img from '../img/selector.png';
 
-// ! FIXME figure this out
 const SIZE = 40;
 
 // Indicator to show the selected tile.
@@ -15,11 +14,13 @@ class UnitSelector extends Component {
       position: 'absolute',
       left: `${x + SIZE * 15}px`,
       top: `${y + SIZE * 12}px`,
+      pointerEvents: 'none'
     };
     return (
       <div style={style}>
         <img
           src={img}
+          alt=''
           width={SIZE * 2}
           height={SIZE * 2}
         />

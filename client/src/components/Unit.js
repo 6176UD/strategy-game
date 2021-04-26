@@ -16,10 +16,10 @@ class Unit extends Component {
   }
 
   render() {
-    const q = this.props.q, r = this.props.r;
-    const img = this.props.img;
+    const { q, r, img } = this.props;
     const x = SIZE * 3./2 * q;
     const y = SIZE * (Math.sqrt(3) / 2 * q + Math.sqrt(3) * r);
+    // TODO this scaling doesn't make much sense, do some math later to clean it up
     const style = {
       position: 'absolute',
       left: `${x + SIZE * 15}px`,
@@ -30,26 +30,31 @@ class Unit extends Component {
     }
     return (
       <div style={style}>
-        <div></div>
+        {/* Background hexagon tile underneath */}
         <div style={imgStyle}>
           <img
             src={hexImg}
+            alt=''
             width={SIZE * 2}
             height={SIZE * 2}
             onClick={this.handleClick}
           />
         </div>
-        <div style={imgStyle}>
-          <img
-            src={img}
-            width={SIZE * 2}
-            height={SIZE * 2}
-            onClick={this.handleClick}
-          />
-        </div>
+        {/* In the case of an Empty tile, do not display if img is null */}
+        {img &&
+          <div style={imgStyle}>
+            <img
+              src={img}
+              alt=''
+              width={SIZE * 2}
+              height={SIZE * 2}
+              onClick={this.handleClick}
+            />
+          </div>
+        }
       </div>
     );
   }
 }
 
-export default Unit
+export default Unit;

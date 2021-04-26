@@ -8,7 +8,7 @@ module.exports = class Peasant extends Unit {
 
   // Melee unit
   canAttackTarget(q, r) {
-    return Hex.dist(this.q, this.r, q, r) == 1;
+    return Hex.dist(this.q, this.r, q, r) === 1;
   }
 
   // Attacks targeting the tile (q, r);
