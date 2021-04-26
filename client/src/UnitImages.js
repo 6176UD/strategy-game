@@ -1,5 +1,4 @@
 // ! FIXME: move this to a better place
-import emptyImg from './img/empty.png';
 import basePlayerImg from './img/base-player.png';
 import baseEnemyImg from './img/base-enemy.png';
 import peasantPlayerImg from './img/peasant-player.png';
@@ -13,7 +12,7 @@ const UnitImages = {
   },
   // Does not own
   false: {
-    'Empty': emptyImg,
+    'Empty': null,
     'Base': baseEnemyImg,
     'Peasant': peasantEnemyImg
   }
