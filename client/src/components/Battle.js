@@ -192,7 +192,7 @@ class Battle extends Component {
   handleKeyDown(e) {
     if (e.key === 'Escape') {
       this.deselect();
-    } else if (e.key === 'Enter') {
+    } else if (this.state.turn && e.key === 'Enter') {
       this.handleEndTurnClick();
     } else if (this.state.turn && this.state.action === 'sel') {
       const { unitSel } = this.state;
