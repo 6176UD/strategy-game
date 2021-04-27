@@ -3,7 +3,10 @@ import React, { Component } from 'react';
 import hexImg from '../img/hexagon.png';
 import highlightImg from '../img/highlight.png';
 
-const SIZE = 50;
+const SIZE = {
+  true: 50,
+  false: 30
+}
 
 // Like Unit but for cards
 // ! FIXME repeated code :(
@@ -15,8 +18,8 @@ class Card extends Component {
     const { img, owns, resources, cost, idx, highlighted } = this.props;
     const style = {
       position: 'fixed',
-      left: `15px`,
-      bottom: `${(2 * SIZE - 10) * (idx + 1) + 15}px`,
+      left: `${owns ? 15 : 2 * SIZE[true] + 20}px`,
+      bottom: `${(2 * SIZE[owns] - 10) * (idx + 1) + (owns ? 15 : 30)}px`,
     }
     const hexStyle = { position: 'absolute' };
     const imgStyle = {
@@ -35,8 +38,8 @@ class Card extends Component {
           <img
             src={hexImg}
             alt=''
-            width={SIZE * 2}
-            height={SIZE * 2}
+            width={SIZE[owns] * 2}
+            height={SIZE[owns] * 2}
             onClick={() => this.props.handleClick(owns, idx)}
           />
         </div>
@@ -46,8 +49,8 @@ class Card extends Component {
             <img
               src={img}
               alt=''
-              width={SIZE * 2}
-              height={SIZE * 2}
+              width={SIZE[owns] * 2}
+              height={SIZE[owns] * 2}
             />
           </div>
         }
@@ -57,8 +60,8 @@ class Card extends Component {
             <img
               src={highlightImg}
               alt=''
-              width={SIZE * 2}
-              height={SIZE * 2}
+              width={SIZE[owns] * 2}
+              height={SIZE[owns] * 2}
             />
           </div>
         }

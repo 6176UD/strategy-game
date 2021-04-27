@@ -8,7 +8,7 @@ class InfoMenu extends Component {
       return (<div><p>Empty Tile</p></div>);
     }
     return (
-      <div onKeyDown={this.onKeyPressed} tabIndex={0}>
+      <div>
         <p>Unit: {name} ({owns ? 'Player' : 'Enemy'})</p>
         <p>Health: {health} / {maxHealth}</p>
         {(movesPerTurn > 0) ?

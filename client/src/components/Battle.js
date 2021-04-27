@@ -53,6 +53,7 @@ class Battle extends Component {
         true: Array(NUM_CARDS).fill(null),
         false: Array(NUM_CARDS).fill(null)
       },
+      resources: 0,
       unitSel: null,
       cardSel: null,
       turn: false,
@@ -93,7 +94,20 @@ class Battle extends Component {
   }
 
   handleResourcesUpdate(resources) {
-    this.setState({ resources });
+    // Update resources object as well as resources props of cards
+    this.setState(prevState => {
+      const cards = Object.assign({}, prevState.cards);
+      for (const b of [true, false]) {
+        for (const card of cards[b]) {
+          cards[b][card.props.idx] = <Card
+            key={'card' + (card.props.owns ? 'player' : 'enemy') + card.props.idx}
+            {...card.props}
+            resources={resources[b]}
+          />
+        }
+      }
+      return { cards, resources };
+    });
   }
 
   handleTurnUpdate(turn) {
@@ -253,7 +267,7 @@ class Battle extends Component {
   }
 
   render() {
-    const { grid, cards, unitSel, cardSel, action, turn } = this.state;
+    const { grid, cards, resources, unitSel, cardSel, action, turn } = this.state;
     const gridComponents = [];
     for (let q = -MAP_RADIUS; q <= MAP_RADIUS; q++) {
       let r1 = Math.max(-MAP_RADIUS, -q - MAP_RADIUS);
@@ -283,14 +297,24 @@ class Battle extends Component {
     const cardComponents = [];
     for (const b of [true, false]) {
       for (const card of cards[b]) {
-        cardComponents.push(card);
+        if (card === null) continue;
+        if (cardSel === card) {
+          cardComponents.push(<Card
+            key={'card' + (card.props.owns ? 'player' : 'enemy') + card.props.idx}
+            {...card.props}
+            highlighted={true}
+          />);
+        } else {
+          cardComponents.push(card);
+        }
       }
     }
-    console.log(turn);
     return (
       <div>
         <p>Battle Zone! (WIP)</p>
         <p>{turn ? 'Your' : "Opponent's"} Turn</p>
+        <p>Your resources: {resources[true]}</p>
+        <p>Opponent resources: {resources[false]}</p>
         {turn && <button onClick={this.handleEndTurnClick}>End Turn</button>}
         {unitSel &&
         <InfoMenu
