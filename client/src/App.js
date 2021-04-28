@@ -6,7 +6,9 @@ import Waiting from './components/Waiting';
 import Draft from './components/Draft';
 import Battle from './components/Battle';
 
-const socket = socketIOClient.connect('localhost:4001');
+// const socket = socketIOClient.connect();
+const socket = (process.env.NODE_ENV === 'production' ? 
+  socketIOClient.connect() : socketIOClient.connect('localhost:4001'));
 
 class App extends Component {
   constructor() {
