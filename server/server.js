@@ -18,11 +18,12 @@ const io = socketIO(server, {
 const port = process.env.PORT || 4001;
 app.set('port', port);
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.resolve(__dirname, '../client/build')));
-} else {
-  app.use(express.static(path.resolve(__dirname, '../client')));
-}
+app.use(express.static(path.resolve(__dirname, '../client/build')));
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(express.static(path.resolve(__dirname, '../client/build')));
+// } else {
+//   app.use(express.static(path.resolve(__dirname, '../client')));
+// }
 
 io.on('connection', async socket => {
   console.info('New client connected');
