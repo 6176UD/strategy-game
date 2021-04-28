@@ -27,6 +27,7 @@ const SUMMON_ZONES = {
 }
 
 module.exports = class Battle {
+  // TODO: should also take in the cards drafted (when that is implemented)
   constructor(room) {
     this.room = room;
     
@@ -243,7 +244,7 @@ module.exports = class Battle {
     }
 
     // Tell client the turn has end
-    // Client is responsible for mirroring the game logic
+    // ! Client is responsible for mirroring the game logic.
     this.emitTurnUpdate(this.turn);
 
     // Also update resources

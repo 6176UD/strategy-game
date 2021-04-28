@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import hexImg from '../img/hexagon.png';
 import highlightImg from '../img/highlight.png';
 
+// ! REEEEE
+const NUM_CARDS = 5;
 const SIZE = {
   true: 50,
   false: 30
@@ -11,15 +13,12 @@ const SIZE = {
 // Like Unit but for cards
 // ! FIXME repeated code :(
 class Card extends Component {
-  constructor(props) {
-    super(props);
-  }
   render() {
     const { img, owns, resources, cost, idx, highlighted } = this.props;
     const style = {
       position: 'fixed',
       left: `${owns ? 15 : 2 * SIZE[true] + 20}px`,
-      bottom: `${(2 * SIZE[owns] - 10) * (idx + 1) + (owns ? 15 : 30)}px`,
+      bottom: `${(2 * SIZE[owns] - 10) * (NUM_CARDS - idx) + (owns ? 15 : 30)}px`,
     }
     const hexStyle = { position: 'absolute' };
     const imgStyle = {

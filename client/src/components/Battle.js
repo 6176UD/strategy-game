@@ -11,6 +11,16 @@ import CanAttackTarget from '../AttackPatterns';
 
 const MAP_RADIUS = 7;
 const NUM_CARDS = 5;
+// Copy-paste spaghetti go BRRRRR
+const SUMMON_ZONES = {
+  '-3': { 7: null },
+  '-2': { 6: null, 7: null},
+  '-1': { 5: null, 6: null, 7: null },
+  0: { 5: null, 6: null, 7: null },
+  1: { 4: null, 5: null, 6: null},
+  2: { 4: null, 5: null },
+  3: { 4 : null}
+}
 
 // Handles client-side battle logic.
 class Battle extends Component {
@@ -183,7 +193,7 @@ class Battle extends Component {
 
   // TODO not fully implemented
   handleUnitSummon(q, r) {
-    if (this.state.grid[q][r].props.name != 'Empty') {
+    if (this.state.grid[q][r].props.name !== 'Empty') {
       this.deselect();
       return;
     }
@@ -240,21 +250,35 @@ class Battle extends Component {
   handleKeyDown(e) {
     if (e.key === 'Escape') {
       this.deselect();
-    } else if (this.state.turn && e.key === 'Enter') {
+      return;
+    }
+    if (this.state.turn && e.key === 'Enter') {
       this.handleEndTurnClick();
-    } else if (this.state.turn && this.state.action === 'sel') {
-      const { unitSel } = this.state;
-      if (unitSel && unitSel.props.owns) {
-        if (e.key === 'g' && unitSel.props.moves > 0) {
-          this.handleMoveClick();
-        } else if (e.key === 'a' && unitSel.props.canAttackThisTurn) {
-          this.handleAttackClick();
+      return;
+    }
+    if (this.state.action === 'sel') {
+      if (this.state.turn) {
+        const { unitSel } = this.state;
+        if (unitSel && unitSel.props.owns) {
+          if (e.key === 'g' && unitSel.props.moves > 0) {
+            this.handleMoveClick();
+            return;
+          }
+          if (e.key === 'a' && unitSel.props.canAttackThisTurn) {
+            this.handleAttackClick();
+            return;
+          }
+        }
+        const { cardSel, resources } = this.state;
+        if (e.key === 's' && cardSel && cardSel.props.owns
+          && cardSel.props.cost <= resources[true]) {
+          this.handleSummonClick();
+          return;
         }
       }
-      const { cardSel, resources } = this.state;
-      if (cardSel && cardSel.props.owns
-        && cardSel.props.cost <= resources[true]) {
-        this.handleSummonClick();
+      const idx = parseInt(e.key);
+      if (1 <= idx && idx <= NUM_CARDS) {
+        this.handleCardClick(true, idx - 1);
       }
     }
   }
@@ -294,11 +318,16 @@ class Battle extends Component {
         // If a unit is selected highlight it.
         // If moving a unit, highlight all tiles it can move to.
         // If attacking with a unit, highlight all tiles it can attack.
+        // If summoning a unit, highlight all tiles it can be summoned at.
         if ((unitSel && unitSel.props.q === q && unitSel.props.r === r)
           || (action === 'move'
             && unit.props.name === 'Empty'
             && Hex.dist(unitSel.props.q, unitSel.props.r, q, r) <= unitSel.props.moves)
-          || (action === 'attack' && CanAttackTarget[unitSel.props.name](unitSel, q, r))) {
+          || (action === 'attack' && CanAttackTarget[unitSel.props.name](unitSel, q, r))
+          || (action === 'summon'
+              && unit.props.name === 'Empty'
+              && unit.props.q in SUMMON_ZONES
+              && unit.props.r in SUMMON_ZONES[unit.props.q])) {
           gridComponents.push(<Unit
             key={[unit.props.q, unit.props.r]}
             {...unit.props}
@@ -325,36 +354,51 @@ class Battle extends Component {
         }
       }
     }
-    const menuStyle = {
+    const outerMenuStyle = {
       position: 'fixed',
-      top: 5,
-      left: 5
+      top: '10px',
+      left: '10px',
+      opacity: 0.9,
+    }
+    const innerMenuStyle = {
+      backgroundColor: 'white',
+      border: '1px solid black',
+      paddingLeft: '10px',
+      paddingRight: '10px',
+      paddingBottom: '10px',
+      marginBottom: '5px'
     }
     return (
       <div>
-        <div style={menuStyle}>
-          <p>Battle Zone! (WIP)</p>
-          <p>{turn ? 'Your' : "Opponent's"} Turn</p>
-          <p>Your resources: {resources[true]}</p>
-          <p>Opponent resources: {resources[false]}</p>
-          {turn && <button onClick={this.handleEndTurnClick}>End Turn</button>}
-          {unitSel &&
-            <UnitInfoMenu
-              unit={unitSel}
-              turn={turn}
-              handleMoveClick={this.handleMoveClick}
-              handleAttackClick={this.handleAttackClick}
-            />
-           }
-          {cardSel &&
-            <CardInfoMenu
-              card={cardSel}
-              handleSummonClick={this.handleSummonClick}
-            />
-          }
-        </div>
         {gridComponents}
         {cardComponents}
+        <div style={outerMenuStyle}>
+          <div style={innerMenuStyle}>
+            <p>Battle Zone!</p>
+            <p>{turn ? 'Your' : "Opponent's"} Turn</p>
+            <p>Your resources: {resources[true]}</p>
+            <p>Opponent resources: {resources[false]}</p>
+          {turn && <button onClick={this.handleEndTurnClick}>End Turn</button>}
+          </div>
+          {unitSel &&
+            <div style={innerMenuStyle}>
+              <UnitInfoMenu
+                unit={unitSel}
+                turn={turn}
+                handleMoveClick={this.handleMoveClick}
+                handleAttackClick={this.handleAttackClick}
+              />
+            </div>
+          }
+          {cardSel &&
+            <div style={innerMenuStyle}>
+              <CardInfoMenu
+                card={cardSel}
+                handleSummonClick={this.handleSummonClick}
+              />
+            </div>
+          }
+        </div>
       </div>
     );
   }

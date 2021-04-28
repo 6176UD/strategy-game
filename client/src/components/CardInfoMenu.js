@@ -11,7 +11,7 @@ class CardInfoMenu extends Component {
           <p>Moves: {movesPerTurn}</p> : <p>Cannot move</p>
         }
         <p>{canAttack ? 'Can' : 'Cannot'} attack</p>
-        <p>Cost: {cost} {cost == 1 ? 'resource' : 'resources'}</p>
+        <p>Cost: {cost} {cost === 1 ? 'resource' : 'resources'}</p>
         {owns && hasTurn && cost <= resources &&
           <button onClick={this.props.handleSummonClick}>Summon</button>
         }
