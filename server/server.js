@@ -8,9 +8,9 @@ const game = require('./game.js');
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server, {
-  // !FIXME TEMPORARY
+  // ! i am lazy hopefully no break
   cors: {
-    origin: 'http://localhost:3000',
+    origin: '*',
     methods: ['GET', 'POST']
   }
 });
