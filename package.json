@@ -4,13 +4,14 @@
   "description": "Strategy game for YR Hacks 2021",
   "main": "index.js",
   "scripts": {
-    "start": "node ./server/server"
+    "start": "node ./server/server",
+    "build": "cd client && npm build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/6176UD/strategy-game.git"
   },
-  "author": "FIXME",
+  "author": "6176UD",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/6176UD/strategy-game/issues"
