@@ -14,6 +14,18 @@ const NUM_CARDS = 5;
 const STARTING_RESOURCES = 5;
 const RESOURCES_PER_TURN = 3;
 
+// Doing it like this because JS sucks
+// [[-3, 7], [-2, 7], [-1, 7], [0, 7], [-2, 6], [-1, 6], [0, 6], [1, 6], [-1, 5], [0, 5], [1, 5], [2, 5], [1, 4], [2, 4], [3, 4]]);
+const SUMMON_ZONES = {
+  '-3': { 7: null },
+  '-2': { 6: null, 7: null},
+  '-1': { 5: null, 6: null, 7: null },
+  0: { 5: null, 6: null, 7: null },
+  1: { 4: null, 5: null, 6: null},
+  2: { 4: null, 5: null },
+  3: { 4 : null}
+}
+
 module.exports = class Battle {
   constructor(room) {
     this.room = room;
@@ -68,13 +80,22 @@ module.exports = class Battle {
 
     // Listen for input from players
     for (const player of Object.values(this.room.players)) {
+      const isInt = Number.isInteger;
       player.socket.on('move', data => {
-        if (!('q1' in data) || !('r1' in data) || !('q2' in data) || !('r2' in data)) return;
+        if (!('q1' in data && 'r1' in data && 'q2' in data && 'r2' in data
+              && isInt(data.q1) && isInt(data.r1) && isInt(data.q2) && isInt(data.r2))) return;
         this.handleMove(player.num, data.q1, data.r1, data.q2, data.r2)
       });
       player.socket.on('attack', data => {
-        if (!('q1' in data) || !('r1' in data) || !('q2' in data) || !('r2' in data)) return;
+        if (!('q1' in data && 'r1' in data && 'q2' in data && 'r2' in data
+              && isInt(data.q1) && isInt(data.r1) && isInt(data.q2) && isInt(data.r2))) return;
         this.handleAttack(player.num, data.q1, data.r1, data.q2, data.r2)
+      });
+      player.socket.on('summon', data => {
+        if (!('cardIdx' in data && 'q' in data && 'r' in data
+              && isInt(data.cardIdx) && isInt(data.q) && isInt(data.r)
+              && 0 <= data.cardIdx && data.cardIdx < NUM_CARDS)) return;
+        this.handleSummon(player.num, data.cardIdx, data.q, data.r);
       });
       player.socket.on('end-turn', () => this.handleEndTurn(player.num));
     }
@@ -176,7 +197,7 @@ module.exports = class Battle {
     if (!(q1 in this.grid) || !(r1 in this.grid[q1])
       || !(q2 in this.grid) || !(r2 in this.grid[q2])) return;
     
-    if (playerNum == 2) {
+    if (playerNum === 2) {
       q1 = -q1, r1 = -r1, q2 = -q2, r2 = -r2;
     }
     if (this.turn !== playerNum
@@ -186,6 +207,23 @@ module.exports = class Battle {
     this.grid[q1][r1].attack(q2, r2);
     this.grid[q1][r1].canAttackThisTurn = false;
     this.emitUnitUpdate(this.grid[q1][r1]);
+  }
+
+  // Called when client summons a unit
+  // Assumes params are cleaned and will not cause erros.
+  handleSummon(playerNum, cardIdx, q, r) {
+    const oldq = q, oldr = r;
+    if (playerNum === 2) {
+      q = -q, r = -r;
+    }
+    if (this.grid[q][r].name != 'Empty'
+       || !(oldq in SUMMON_ZONES && oldr in SUMMON_ZONES[oldq])
+       || this.cards[playerNum][cardIdx] > this.resources[playerNum]) return;
+    const UnitClass = this.cards[playerNum][cardIdx].constructor.UnitClass;
+    this.grid[q][r] = new UnitClass(this, playerNum, q, r);
+    this.resources[playerNum] -= this.cards[playerNum][cardIdx].cost;
+    this.emitUnitUpdate(this.grid[q][r]);
+    this.emitResourcesUpdate();
   }
 
   // Called when player ends their turn

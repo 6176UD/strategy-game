@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 
 import Unit from './Unit';
 import Card from './Card';
-import InfoMenu from './InfoMenu';
+import UnitInfoMenu from './UnitInfoMenu';
+import CardInfoMenu from './CardInfoMenu';
 
 import Hex from '../Hex';
 import UnitImages from '../UnitImages';
@@ -129,6 +130,17 @@ class Battle extends Component {
           />
         }
       }
+      const cards = Object.assign({}, prevState.cards);
+      for (let b of [true, false]) {
+        for (let i = 0; i < NUM_CARDS; i++) {
+          const card = cards[b][i];
+          cards[b][i] = <Card
+            key={'card' + (card.props.owns ? 'player' : 'enemy') + card.props.idx}
+            {...card.props}
+            hasTurn={turn === card.props.owns}
+          />
+        }
+      }
       return { grid, turn };
     });
     // unitSel is invalid now that grid has changed
@@ -171,9 +183,13 @@ class Battle extends Component {
 
   // TODO not fully implemented
   handleUnitSummon(q, r) {
+    if (this.state.grid[q][r].props.name != 'Empty') {
+      this.deselect();
+      return;
+    }
     this.props.socket.emit('summon', {
-      cardNum: this.state.cardSel.num,
-      q: q, r: r 
+      cardIdx: this.state.cardSel.props.idx,
+      q: q, r: r
     });
     this.deselect();
   }
@@ -229,7 +245,7 @@ class Battle extends Component {
     } else if (this.state.turn && this.state.action === 'sel') {
       const { unitSel } = this.state;
       if (unitSel && unitSel.props.owns) {
-        if (e.key === 'g' &&  unitSel.props.moves > 0) {
+        if (e.key === 'g' && unitSel.props.moves > 0) {
           this.handleMoveClick();
         } else if (e.key === 'a' && unitSel.props.canAttackThisTurn) {
           this.handleAttackClick();
@@ -237,8 +253,8 @@ class Battle extends Component {
       }
       const { cardSel, resources } = this.state;
       if (cardSel && cardSel.props.owns
-          && cardSel.props.cost <= resources[true]) {
-          this.handleSummonClick();
+        && cardSel.props.cost <= resources[true]) {
+        this.handleSummonClick();
       }
     }
   }
@@ -280,8 +296,8 @@ class Battle extends Component {
         // If attacking with a unit, highlight all tiles it can attack.
         if ((unitSel && unitSel.props.q === q && unitSel.props.r === r)
           || (action === 'move'
-              && unit.props.name === 'Empty'
-              && Hex.dist(unitSel.props.q, unitSel.props.r, q, r) <= unitSel.props.moves)
+            && unit.props.name === 'Empty'
+            && Hex.dist(unitSel.props.q, unitSel.props.r, q, r) <= unitSel.props.moves)
           || (action === 'attack' && CanAttackTarget[unitSel.props.name](unitSel, q, r))) {
           gridComponents.push(<Unit
             key={[unit.props.q, unit.props.r]}
@@ -309,20 +325,34 @@ class Battle extends Component {
         }
       }
     }
+    const menuStyle = {
+      position: 'fixed',
+      top: 5,
+      left: 5
+    }
     return (
       <div>
-        <p>Battle Zone! (WIP)</p>
-        <p>{turn ? 'Your' : "Opponent's"} Turn</p>
-        <p>Your resources: {resources[true]}</p>
-        <p>Opponent resources: {resources[false]}</p>
-        {turn && <button onClick={this.handleEndTurnClick}>End Turn</button>}
-        {unitSel &&
-        <InfoMenu
-          unit={grid[unitSel.props.q][unitSel.props.r]}
-          turn={turn}
-          handleMoveClick={this.handleMoveClick}
-          handleAttackClick={this.handleAttackClick}
-        />}
+        <div style={menuStyle}>
+          <p>Battle Zone! (WIP)</p>
+          <p>{turn ? 'Your' : "Opponent's"} Turn</p>
+          <p>Your resources: {resources[true]}</p>
+          <p>Opponent resources: {resources[false]}</p>
+          {turn && <button onClick={this.handleEndTurnClick}>End Turn</button>}
+          {unitSel &&
+            <UnitInfoMenu
+              unit={unitSel}
+              turn={turn}
+              handleMoveClick={this.handleMoveClick}
+              handleAttackClick={this.handleAttackClick}
+            />
+           }
+          {cardSel &&
+            <CardInfoMenu
+              card={cardSel}
+              handleSummonClick={this.handleSummonClick}
+            />
+          }
+        </div>
         {gridComponents}
         {cardComponents}
       </div>

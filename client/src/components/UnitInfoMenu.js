@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
 
-class InfoMenu extends Component {
+class UnitInfoMenu extends Component {
   render() {
     const { owns, name, health, maxHealth, moves, movesPerTurn, canAttack, canAttackThisTurn } = this.props.unit.props;
     const turn = this.props.turn;
+
+    // ! FOR TESTING ZONES
+    // return (<p>{this.props.unit.props.q}, {this.props.unit.props.r}</p>);
+
     if (name === 'Empty') {
       return (<div><p>Empty Tile</p></div>);
     }
     return (
       <div>
+
         <p>Unit: {name} ({owns ? 'Player' : 'Enemy'})</p>
         <p>Health: {health} / {maxHealth}</p>
         {(movesPerTurn > 0) ?
@@ -36,4 +41,4 @@ class InfoMenu extends Component {
   }
 }
 
-export default InfoMenu;
+export default UnitInfoMenu;
