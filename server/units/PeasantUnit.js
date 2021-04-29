@@ -4,7 +4,7 @@ const Hex = require('../Hex');
 const stats = {
   name: 'Peasant',
   maxHealth: 3,
-  movesPerTurn: 1,
+  movesPerTurn: 2,
   canAttack: true
 }
 

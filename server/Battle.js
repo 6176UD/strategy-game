@@ -4,9 +4,9 @@ const Hex = require('./Hex');
 // Units
 const EmptyUnit = require('./units/EmptyUnit');
 const BaseUnit = require('./units/BaseUnit');
-const PeasantUnit = require('./units/PeasantUnit');
 
 // Cards
+// TODO remove after Draft is implemented
 const PeasantCard = require('./cards/PeasantCard');
 
 const MAP_RADIUS = 7;
@@ -25,6 +25,34 @@ const SUMMON_ZONES = {
   2: { 4: null, 5: null },
   3: { 4 : null}
 }
+
+const RESOURCE_ZONES = [
+  // Bottom left
+  {
+    tiles: [[-5, 5], [-4, 5], [-4, 4], [-3, 4]],
+    val: 4
+  },
+  // Bottom right
+  {
+    tiles: [[3, 1], [4, 1], [4, 0], [5, 0]],
+    val: 4
+  },
+  // Top left
+  {
+    tiles: [[-5, 0], [-4, 0], [-4, -1], [-3, -1]],
+    val: 4
+  },
+  // Top right
+  {
+    tiles: [[3, -4], [4, -4], [4, -5], [5, -5]],
+    val: 4
+  },
+  // Centre
+  {
+    tiles: [[-1, 1], [0, 1], [-1, 0], [0, 0], [1, 0], [0, -1], [1, -1]],
+    val: 6
+  }
+];
 
 module.exports = class Battle {
   // TODO: should also take in the cards drafted (when that is implemented)
@@ -68,12 +96,6 @@ module.exports = class Battle {
     this.emitUnitUpdate(this.grid[0][MAP_RADIUS - 1]);
     this.grid[0][-MAP_RADIUS + 1] = new BaseUnit(this, 2, 0, -MAP_RADIUS + 1);
     this.emitUnitUpdate(this.grid[0][-MAP_RADIUS + 1]);
-
-    // ! TESTING peasants
-    this.grid[0][MAP_RADIUS - 2] = new PeasantUnit(this, 1, 0, MAP_RADIUS - 2);
-    this.grid[0][-MAP_RADIUS + 2] = new PeasantUnit(this, 2, 0, -MAP_RADIUS + 2);
-    this.emitUnitUpdate(this.grid[0][MAP_RADIUS - 2]);
-    this.emitUnitUpdate(this.grid[0][-MAP_RADIUS + 2]);
 
     // Player 1's turn
     this.turn = 2;
@@ -248,9 +270,20 @@ module.exports = class Battle {
     this.emitTurnUpdate(this.turn);
 
     // Also update resources
-    this.resources[(playerNum % 2) + 1] += RESOURCES_PER_TURN;
-
-    // TODO: resource zone logic here
+    this.resources[this.turn] += RESOURCES_PER_TURN;
+    for (const zone of RESOURCE_ZONES) {
+      const controls = { 1: false, 2: false };
+      for (const tile of zone.tiles) {
+        if (this.grid[tile[0]][tile[1]].name !== 'Empty') {
+          controls[this.grid[tile[0]][tile[1]].playerNum] = true;
+        }
+      }
+      if (this.turn === 1 && controls[1] && !controls[2]) {
+        this.resources[1] += zone.val;
+      } else if (this.turn === 2 && controls[2] && !controls[1]) {
+        this.resources[2] += zone.val;
+      }
+    }
 
     this.emitResourcesUpdate();
   }

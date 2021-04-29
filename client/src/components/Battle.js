@@ -270,7 +270,7 @@ class Battle extends Component {
           }
         }
         const { cardSel, resources } = this.state;
-        if (e.key === 's' && cardSel && cardSel.props.owns
+        if (e.key === ' ' && cardSel && cardSel.props.owns
           && cardSel.props.cost <= resources[true]) {
           this.handleSummonClick();
           return;
