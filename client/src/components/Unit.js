@@ -1,10 +1,20 @@
 import React, { Component } from 'react';
 
 import hexImg from '../img/hexagon.png';
+import resourceImg from '../img/resource-zone.png';
 import highlightImg from '../img/highlight.png';
 
 // Radius of a tile
 const SIZE = 40;
+
+// ! Just storing this here because I'm lazy
+// ! Will ~~probably~~ hopefully figure out an alternative soon
+const JS_SUCKS_LMAO = [[-5, 5], [-4, 5], [-4, 4], [-3, 4], [3, 1], [4, 1], [4, 0], [5, 0], [-5, 0], [-4, 0], [-4, -1], [-3, -1], [3, -4], [4, -4], [4, -5], [5, -5], [-1, 1], [0, 1], [-1, 0], [0, 0], [1, 0], [0, -1], [1, -1]];
+const RESOURCE_TILES = {};
+for (const x of JS_SUCKS_LMAO) {
+  if (!(x[0] in RESOURCE_TILES)) RESOURCE_TILES[x[0]] = {};
+  RESOURCE_TILES[x[0]][x[1]] = null;
+}
 
 // Displays a unit tile. Does NOT handle any game logic.
 class Unit extends Component {
@@ -32,7 +42,7 @@ class Unit extends Component {
         {/* Background hexagon tile underneath */}
         <div style={hexStyle}>
           <img
-            src={hexImg}
+            src={(q in RESOURCE_TILES && r in RESOURCE_TILES[q]) ? resourceImg : hexImg}
             alt=''
             width={SIZE * 2}
             height={SIZE * 2}

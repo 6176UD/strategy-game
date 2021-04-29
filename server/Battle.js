@@ -11,7 +11,7 @@ const PeasantCard = require('./cards/PeasantCard');
 
 const MAP_RADIUS = 7;
 const NUM_CARDS = 5;
-const STARTING_RESOURCES = 5;
+const STARTING_RESOURCES = 3;
 const RESOURCES_PER_TURN = 3;
 
 // Doing it like this because JS sucks
@@ -30,27 +30,27 @@ const RESOURCE_ZONES = [
   // Bottom left
   {
     tiles: [[-5, 5], [-4, 5], [-4, 4], [-3, 4]],
-    val: 4
+    val: 1
   },
   // Bottom right
   {
     tiles: [[3, 1], [4, 1], [4, 0], [5, 0]],
-    val: 4
+    val: 1
   },
   // Top left
   {
     tiles: [[-5, 0], [-4, 0], [-4, -1], [-3, -1]],
-    val: 4
+    val: 1
   },
   // Top right
   {
     tiles: [[3, -4], [4, -4], [4, -5], [5, -5]],
-    val: 4
+    val: 1
   },
   // Centre
   {
     tiles: [[-1, 1], [0, 1], [-1, 0], [0, 0], [1, 0], [0, -1], [1, -1]],
-    val: 6
+    val: 3
   }
 ];
 
