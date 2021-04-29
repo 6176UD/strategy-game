@@ -2,13 +2,13 @@ const Unit = require('./Unit');
 const Hex = require('../Hex');
 
 const stats = {
-  name: 'Peasant',
-  maxHealth: 3,
-  movesPerTurn: 2,
+  name: 'Footsoldier',
+  maxHealth: 10,
+  movesPerTurn: 3,
   canAttack: true
 }
 
-module.exports = class PeasantUnit extends Unit {
+module.exports = class FootSoldierUnit extends Unit {
   constructor(battle, playerNum, q, r) {
     super(stats, battle, playerNum, q, r);
   }
@@ -22,6 +22,6 @@ module.exports = class PeasantUnit extends Unit {
   }
 
   attack(q, r) {
-    this.battle.dealDamage(q, r, 2);
+    this.battle.dealDamage(q, r, 5);
   }
 }

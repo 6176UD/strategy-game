@@ -8,6 +8,8 @@ const BaseUnit = require('./units/BaseUnit');
 // Cards
 // TODO remove after Draft is implemented
 const PeasantCard = require('./cards/PeasantCard');
+const ScoutCard = require('./cards/ScoutCard');
+const FootsoldierCard = require('./cards/FootsoldierCard');
 
 const MAP_RADIUS = 7;
 const NUM_CARDS = 5;
@@ -73,12 +75,20 @@ module.exports = class Battle {
       '1': [],
       '2': []
     }
-    for (let i = 0; i < NUM_CARDS; i++) {
+    for (let i = 0; i < NUM_CARDS - 2; i++) {
       this.cards[1].push(new PeasantCard());
       this.cards[2].push(new PeasantCard());
       this.emitCardUpdate(1, i);
       this.emitCardUpdate(2, i);
     }
+    this.cards[1].push(new ScoutCard());
+    this.cards[2].push(new ScoutCard());
+    this.emitCardUpdate(1, 3);
+    this.emitCardUpdate(2, 3);
+    this.cards[1].push(new FootsoldierCard());
+    this.cards[2].push(new FootsoldierCard());
+    this.emitCardUpdate(1, 4);
+    this.emitCardUpdate(2, 4);
 
     // Build hex grid of empty tiles
     this.grid = {};
