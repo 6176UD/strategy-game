@@ -9,7 +9,11 @@ const BaseUnit = require('./units/BaseUnit');
 // TODO remove after Draft is implemented
 const PeasantCard = require('./cards/PeasantCard');
 const ScoutCard = require('./cards/ScoutCard');
+const GoblinCard = require('./cards/GoblinCard');
 const FootsoldierCard = require('./cards/FootsoldierCard');
+const BowmanCard = require('./cards/BowmanCard');
+const PikemanCard = require('./cards/PikemanCard');
+const CalvaryCard = require('./cards/CalvaryCard');
 
 const MAP_RADIUS = 7;
 const NUM_CARDS = 5;
@@ -70,25 +74,26 @@ module.exports = class Battle {
 
     // Init cards
     // ! This should come from drafting
-    // ! testing 5 peasant cards lol
     this.cards = {
       '1': [],
       '2': []
     }
-    for (let i = 0; i < NUM_CARDS - 2; i++) {
-      this.cards[1].push(new PeasantCard());
-      this.cards[2].push(new PeasantCard());
-      this.emitCardUpdate(1, i);
-      this.emitCardUpdate(2, i);
+
+    // ! TEMPORARY: giving players 5 random cards each (out of the 8 currently)
+    const shuffle = arr => {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
     }
-    this.cards[1].push(new ScoutCard());
-    this.cards[2].push(new ScoutCard());
-    this.emitCardUpdate(1, 3);
-    this.emitCardUpdate(2, 3);
-    this.cards[1].push(new FootsoldierCard());
-    this.cards[2].push(new FootsoldierCard());
-    this.emitCardUpdate(1, 4);
-    this.emitCardUpdate(2, 4);
+    const CardClasses = [PeasantCard, ScoutCard, GoblinCard, FootsoldierCard, BowmanCard, PikemanCard, CalvaryCard];
+    for (const playerNum of [1, 2]) {
+      shuffle(CardClasses);
+      for (let i = 0; i < NUM_CARDS; i++) {
+        this.cards[playerNum][i] = new CardClasses[i]();
+        this.emitCardUpdate(playerNum, i);
+      }
+    }
 
     // Build hex grid of empty tiles
     this.grid = {};
