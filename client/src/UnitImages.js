@@ -13,8 +13,8 @@ import bowmanPlayerImg from './img/bowman-player.png';
 import bowmanEnemyImg from './img/bowman-enemy.png';
 import pikemanPlayerImg from './img/pikeman-player.png';
 import pikemanEnemyImg from './img/pikeman-enemy.png';
-import calvaryPlayerImg from './img/calvary-player.png';
-import calvaryEnemyImg from './img/calvary-enemy.png';
+import cavalryPlayerImg from './img/cavalry-player.png';
+import cavalryEnemyImg from './img/cavalry-enemy.png';
 
 const UnitImages = {
   // Owns
@@ -26,7 +26,7 @@ const UnitImages = {
     'Footsoldier': footsoldierPlayerImg,
     'Bowman': bowmanPlayerImg,
     'Pikeman': pikemanPlayerImg,
-    'Calvary': calvaryPlayerImg
+    'Cavalry': cavalryPlayerImg
   },
   // Does not own
   false: {
@@ -38,7 +38,7 @@ const UnitImages = {
     'Footsoldier': footsoldierEnemyImg,
     'Bowman': bowmanEnemyImg,
     'Pikeman': pikemanEnemyImg,
-    'Calvary': calvaryEnemyImg
+    'Cavalry': cavalryEnemyImg
   }
 }
 

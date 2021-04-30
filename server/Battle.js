@@ -13,7 +13,7 @@ const GoblinCard = require('./cards/GoblinCard');
 const FootsoldierCard = require('./cards/FootsoldierCard');
 const BowmanCard = require('./cards/BowmanCard');
 const PikemanCard = require('./cards/PikemanCard');
-const CalvaryCard = require('./cards/CalvaryCard');
+const CavalryCard = require('./cards/CavalryCard');
 
 const MAP_RADIUS = 7;
 const NUM_CARDS = 5;
@@ -86,7 +86,7 @@ module.exports = class Battle {
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }
     }
-    const CardClasses = [PeasantCard, ScoutCard, GoblinCard, FootsoldierCard, BowmanCard, PikemanCard, CalvaryCard];
+    const CardClasses = [PeasantCard, ScoutCard, GoblinCard, FootsoldierCard, BowmanCard, PikemanCard, CavalryCard];
     for (const playerNum of [1, 2]) {
       shuffle(CardClasses);
       for (let i = 0; i < NUM_CARDS; i++) {

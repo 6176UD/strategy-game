@@ -1,14 +1,14 @@
 const Card = require('./Card');
-const CalvaryUnit = require('../units/CalvaryUnit')
+const CavalryUnit = require('../units/CavalryUnit')
 
 const cost = 4;
 
 module.exports = class BowmanCard extends Card {
   constructor() {
-    super(CalvaryUnit.stats, cost);
+    super(CavalryUnit.stats, cost);
   }
 
   static get UnitClass() {
-    return CalvaryUnit;
+    return CavalryUnit;
   }
 }

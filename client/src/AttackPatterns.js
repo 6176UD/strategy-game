@@ -20,7 +20,7 @@ const CanAttackTarget = {
   'Pikeman': (unit, q, r) => {
     return Hex.dist(unit.props.q, unit.props.r, q, r) <= 2;
   },
-  'Calvary': (unit, q, r) => {
+  'Cavalry': (unit, q, r) => {
     return Hex.dist(unit.props.q, unit.props.r, q, r) <= 1;
   },
 }

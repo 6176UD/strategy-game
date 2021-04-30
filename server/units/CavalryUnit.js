@@ -2,13 +2,13 @@ const Unit = require('./Unit');
 const Hex = require('../Hex');
 
 const stats = {
-  name: 'Calvary',
+  name: 'Cavalry',
   maxHealth: 10,
   movesPerTurn: 4,
   canAttack: true
 }
 
-module.exports = class CalvaryUnit extends Unit {
+module.exports = class CavalryUnit extends Unit {
   constructor(battle, playerNum, q, r) {
     super(stats, battle, playerNum, q, r);
   }
