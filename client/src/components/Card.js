@@ -24,6 +24,7 @@ class Card extends Component {
     const imgStyle = {
       pointerEvents: 'none',
       position: 'absolute',
+      imageRendering: 'pixelated',
       opacity: cost <= resources ? 1 : 0.5
     };
     const highlightStyle = {

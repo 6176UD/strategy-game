@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 
 import hexImg from '../img/hexagon.png';
+// TODO update based on who controls it
 import resourceImg from '../img/resource-zone.png';
+import aetherCrackImg from '../img/aether-crack.png';
+import aetherFountainImg from '../img/aether-fountain.png';
 import highlightImg from '../img/highlight.png';
 
 // Radius of a tile
@@ -20,6 +23,7 @@ for (const x of JS_SUCKS_LMAO) {
 class Unit extends Component {
   render() {
     const { q, r, name, img, hasTurn, canAttack, canAttackThisTurn, highlighted } = this.props;
+    const isResourceZone = q in RESOURCE_TILES && r in RESOURCE_TILES[q];
     const x = SIZE * 3./2 * q;
     const y = SIZE * (Math.sqrt(3) / 2 * q + Math.sqrt(3) * r);
     const style = {
@@ -31,6 +35,7 @@ class Unit extends Component {
     const imgStyle = {
       pointerEvents: 'none',
       position: 'absolute',
+      imageRendering: 'pixelated',
       opacity: (name === 'Empty' || !hasTurn || canAttack === canAttackThisTurn) ? 1 : 0.5
     };
     const highlightStyle = {
@@ -42,13 +47,24 @@ class Unit extends Component {
         {/* Background hexagon tile underneath */}
         <div style={hexStyle}>
           <img
-            src={(q in RESOURCE_TILES && r in RESOURCE_TILES[q]) ? resourceImg : hexImg}
+            src={isResourceZone ? resourceImg : hexImg}
             alt=''
             width={SIZE * 2}
             height={SIZE * 2}
             onClick={() => this.props.handleClick(this.props.q, this.props.r)}
           />
         </div>
+        {/* If the tile is empty and is a resource zone, display it */}
+        {!img && isResourceZone &&
+          <div style={imgStyle}>
+            <img
+              src={(q === 0 && r === 0) ? aetherFountainImg : aetherCrackImg}
+              alt=''
+              width={SIZE * 2}
+              height={SIZE * 2}
+            />
+          </div>
+        }
         {/* In the case of an Empty tile, do not display if img is null */}
         {img &&
           <div style={imgStyle}>
