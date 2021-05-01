@@ -23,6 +23,10 @@ const CanAttackTarget = {
   'Cavalry': (unit, q, r) => {
     return Hex.dist(unit.props.q, unit.props.r, q, r) <= 1;
   },
+  'Catapult': (unit, q, r) => {
+    const d = Hex.dist(unit.props.q, unit.props.r, q, r);
+    return 3 <= d && d <= 4;
+  }
 }
 
 export default CanAttackTarget;
